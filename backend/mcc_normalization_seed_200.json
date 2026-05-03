@@ -1,0 +1,1802 @@
+[
+  {
+    "mcc": 4011,
+    "group_code": "TS",
+    "group_name": "Transportation Services",
+    "short_description": "Railway",
+    "full_description": "Railroads - Freight",
+    "normalized_category": "Transport",
+    "subcategory": "Railway"
+  },
+  {
+    "mcc": 4111,
+    "group_code": "TS",
+    "group_name": "Transportation Services",
+    "short_description": "Passenger transportation",
+    "full_description": "Transportation-Suburban and Local Commuter Passenger, including Ferries",
+    "normalized_category": "Transport",
+    "subcategory": "Public Transport"
+  },
+  {
+    "mcc": 4112,
+    "group_code": "TS",
+    "group_name": "Transportation Services",
+    "short_description": "Passenger railways",
+    "full_description": "Passenger Railways",
+    "normalized_category": "Transport",
+    "subcategory": "Passenger Rail"
+  },
+  {
+    "mcc": 4119,
+    "group_code": "TS",
+    "group_name": "Transportation Services",
+    "short_description": "Ambulance",
+    "full_description": "Ambulance Services",
+    "normalized_category": "Health",
+    "subcategory": "Ambulance"
+  },
+  {
+    "mcc": 4121,
+    "group_code": "TS",
+    "group_name": "Transportation Services",
+    "short_description": "Taxi",
+    "full_description": "Taxicabs and Limousines",
+    "normalized_category": "Transport",
+    "subcategory": "Taxi"
+  },
+  {
+    "mcc": 4131,
+    "group_code": "TS",
+    "group_name": "Transportation Services",
+    "short_description": "Transportation. Bus",
+    "full_description": "Bus Lines",
+    "normalized_category": "Transport",
+    "subcategory": "Bus"
+  },
+  {
+    "mcc": 4214,
+    "group_code": "TS",
+    "group_name": "Transportation Services",
+    "short_description": "Transportation. Delivery",
+    "full_description": "Motor Freight Carriers,Trucking-Local/Long Distance, Moving and Storage Companies, Local Delivery",
+    "normalized_category": "Transport",
+    "subcategory": "Delivery"
+  },
+  {
+    "mcc": 4215,
+    "group_code": "TS",
+    "group_name": "Transportation Services",
+    "short_description": "Delivery service",
+    "full_description": "Courier Services - Air and Ground, Freight Forwarders",
+    "normalized_category": "Transport",
+    "subcategory": "Courier"
+  },
+  {
+    "mcc": 4411,
+    "group_code": "TS",
+    "group_name": "Transportation Services",
+    "short_description": "Cruise Lines",
+    "full_description": "Cruise Lines",
+    "normalized_category": "Transport",
+    "subcategory": "Cruise Lines"
+  },
+  {
+    "mcc": 4582,
+    "group_code": "TS",
+    "group_name": "Transportation Services",
+    "short_description": "Airports",
+    "full_description": "Airports, Airport Terminals, Flying Fields",
+    "normalized_category": "Transport",
+    "subcategory": "Airports"
+  },
+  {
+    "mcc": 4722,
+    "group_code": "TS",
+    "group_name": "Transportation Services",
+    "short_description": "Tourism",
+    "full_description": "Travel Agencies and Tour Operators",
+    "normalized_category": "Transport",
+    "subcategory": "Travel Agency"
+  },
+  {
+    "mcc": 4723,
+    "group_code": "TS",
+    "group_name": "Transportation Services",
+    "short_description": "Tour operators",
+    "full_description": "Package Tour Operators (Germany Only)",
+    "normalized_category": "Transport",
+    "subcategory": "Tour Operators"
+  },
+  {
+    "mcc": 4729,
+    "group_code": "TS",
+    "group_name": "Transportation Services",
+    "short_description": "Transportation Services",
+    "full_description": "Passenger transportation services",
+    "normalized_category": "Transport",
+    "subcategory": "Transport Services"
+  },
+  {
+    "mcc": 4784,
+    "group_code": "TS",
+    "group_name": "Transportation Services",
+    "short_description": "Toll roads",
+    "full_description": "Bridge and Road Fees, Tolls",
+    "normalized_category": "Transport",
+    "subcategory": "Tolls"
+  },
+  {
+    "mcc": 4789,
+    "group_code": "TS",
+    "group_name": "Transportation Services",
+    "short_description": "Railway",
+    "full_description": "Transportation Services",
+    "normalized_category": "Transport",
+    "subcategory": "Railway"
+  },
+  {
+    "mcc": 4812,
+    "group_code": "US",
+    "group_name": "Utility Services",
+    "short_description": "Telecommunication equipment",
+    "full_description": "Telecommunication Equipment Including Telephone Sales",
+    "normalized_category": "Utilities",
+    "subcategory": "Telecom Equipment"
+  },
+  {
+    "mcc": 4813,
+    "group_code": "US",
+    "group_name": "Utility Services",
+    "short_description": "Retail outlets with telephony",
+    "full_description": "Key-Entry Telecom Merchant providing single local and long-distance phone calls using a central access number in a non-face-to-face environment using key entry",
+    "normalized_category": "Utilities",
+    "subcategory": "Telecom Retail"
+  },
+  {
+    "mcc": 4814,
+    "group_code": "US",
+    "group_name": "Utility Services",
+    "short_description": "Mobile connection",
+    "full_description": "Telecommunication Services",
+    "normalized_category": "Utilities",
+    "subcategory": "Mobile Services"
+  },
+  {
+    "mcc": 4815,
+    "group_code": "US",
+    "group_name": "Utility Services",
+    "short_description": "Telephone services",
+    "full_description": "Telephone services",
+    "normalized_category": "Utilities",
+    "subcategory": "Telephone Services"
+  },
+  {
+    "mcc": 4816,
+    "group_code": "US",
+    "group_name": "Utility Services",
+    "short_description": "Information Services",
+    "full_description": "Computer Network/Information Services",
+    "normalized_category": "Utilities",
+    "subcategory": "Information Services"
+  },
+  {
+    "mcc": 4829,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Money transfer",
+    "full_description": "Wire Transfer Money Orders / Money Transfer",
+    "normalized_category": "Transfers",
+    "subcategory": "Money Transfer"
+  },
+  {
+    "mcc": 4899,
+    "group_code": "US",
+    "group_name": "Utility Services",
+    "short_description": "The television",
+    "full_description": "Cable, Satellite, and Other Pay Television and Radio Services",
+    "normalized_category": "Utilities",
+    "subcategory": "TV / Streaming"
+  },
+  {
+    "mcc": 4900,
+    "group_code": "US",
+    "group_name": "Utility Services",
+    "short_description": "Utilities",
+    "full_description": "Utilities - Electric, Gas, Heating Oil, Sanitary, Water",
+    "normalized_category": "Utilities",
+    "subcategory": "Utilities"
+  },
+  {
+    "mcc": 5200,
+    "group_code": "ROS",
+    "group_name": "Retail Outlet Services",
+    "short_description": "Household products",
+    "full_description": "Home Supply Warehouse Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Home Goods"
+  },
+  {
+    "mcc": 5211,
+    "group_code": "ROS",
+    "group_name": "Retail Outlet Services",
+    "short_description": "Building materials",
+    "full_description": "Building Materials, Lumber Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Building Materials"
+  },
+  {
+    "mcc": 5231,
+    "group_code": "ROS",
+    "group_name": "Retail Outlet Services",
+    "short_description": "Renovation",
+    "full_description": "Glass, Paint, Wallpaper Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Renovation"
+  },
+  {
+    "mcc": 5251,
+    "group_code": "ROS",
+    "group_name": "Retail Outlet Services",
+    "short_description": "Hardware Stores",
+    "full_description": "Hardware Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Hardware"
+  },
+  {
+    "mcc": 5261,
+    "group_code": "ROS",
+    "group_name": "Retail Outlet Services",
+    "short_description": "Garden accessories",
+    "full_description": "Lawn and Garden Supply Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Garden"
+  },
+  {
+    "mcc": 5262,
+    "group_code": "ROS",
+    "group_name": "Retail Outlet Services",
+    "short_description": "Marketplaces",
+    "full_description": "Marketplaces",
+    "normalized_category": "Shopping",
+    "subcategory": "Marketplaces"
+  },
+  {
+    "mcc": 5297,
+    "group_code": "ROS",
+    "group_name": "Retail Outlet Services",
+    "short_description": "Retail stores",
+    "full_description": "Online retail stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Online Retail"
+  },
+  {
+    "mcc": 5298,
+    "group_code": "ROS",
+    "group_name": "Retail Outlet Services",
+    "short_description": "Retail stores",
+    "full_description": "Internet Shopping Grocery Store",
+    "normalized_category": "Shopping",
+    "subcategory": "Online Grocery"
+  },
+  {
+    "mcc": 5309,
+    "group_code": "ROS",
+    "group_name": "Retail Outlet Services",
+    "short_description": "Duty Free",
+    "full_description": "Duty Free Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Duty Free"
+  },
+  {
+    "mcc": 5310,
+    "group_code": "ROS",
+    "group_name": "Retail Outlet Services",
+    "short_description": "Discounters",
+    "full_description": "Discount Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Discount Stores"
+  },
+  {
+    "mcc": 5311,
+    "group_code": "ROS",
+    "group_name": "Retail Outlet Services",
+    "short_description": "Department stores",
+    "full_description": "Department Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Department Stores"
+  },
+  {
+    "mcc": 5331,
+    "group_code": "ROS",
+    "group_name": "Retail Outlet Services",
+    "short_description": "Variety stores",
+    "full_description": "Variety Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Variety Stores"
+  },
+  {
+    "mcc": 5399,
+    "group_code": "ROS",
+    "group_name": "Retail Outlet Services",
+    "short_description": "Merchandise stores",
+    "full_description": "Miscellaneous General Merchandise Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "General Merchandise"
+  },
+  {
+    "mcc": 5411,
+    "group_code": "ROS",
+    "group_name": "Retail Outlet Services",
+    "short_description": "Grocery",
+    "full_description": "Grocery Stores, Supermarkets",
+    "normalized_category": "Food",
+    "subcategory": "Groceries"
+  },
+  {
+    "mcc": 5422,
+    "group_code": "ROS",
+    "group_name": "Retail Outlet Services",
+    "short_description": "Meat",
+    "full_description": "Freezer and Locker Meat Provisioners",
+    "normalized_category": "Food",
+    "subcategory": "Meat"
+  },
+  {
+    "mcc": 5441,
+    "group_code": "ROS",
+    "group_name": "Retail Outlet Services",
+    "short_description": "Sweets",
+    "full_description": "Candy, Nut and Confectionery Stores",
+    "normalized_category": "Food",
+    "subcategory": "Sweets"
+  },
+  {
+    "mcc": 5451,
+    "group_code": "ROS",
+    "group_name": "Retail Outlet Services",
+    "short_description": "Farm goods",
+    "full_description": "Dairy Products Stores",
+    "normalized_category": "Food",
+    "subcategory": "Farm Goods"
+  },
+  {
+    "mcc": 5462,
+    "group_code": "ROS",
+    "group_name": "Retail Outlet Services",
+    "short_description": "Bakeries",
+    "full_description": "Bakeries",
+    "normalized_category": "Food",
+    "subcategory": "Bakeries"
+  },
+  {
+    "mcc": 5499,
+    "group_code": "ROS",
+    "group_name": "Retail Outlet Services",
+    "short_description": "Food stores",
+    "full_description": "Miscellaneous Food Stores - Convenience Stores, Markets, Specialty Stores, and Vending Machines",
+    "normalized_category": "Food",
+    "subcategory": "Specialty Food"
+  },
+  {
+    "mcc": 5511,
+    "group_code": "CV",
+    "group_name": "Cars and vehicles",
+    "short_description": "Car dealerships",
+    "full_description": "Automobile and Truck Dealers - Sales, Service, Repairs, Parts and Leasing",
+    "normalized_category": "Auto",
+    "subcategory": "Car Dealers"
+  },
+  {
+    "mcc": 5521,
+    "group_code": "CV",
+    "group_name": "Cars and vehicles",
+    "short_description": "Car dealerships",
+    "full_description": "Automobile and Truck Dealers-(Used Only)-Sales",
+    "normalized_category": "Auto",
+    "subcategory": "Used Car Dealers"
+  },
+  {
+    "mcc": 5531,
+    "group_code": "CV",
+    "group_name": "Cars and vehicles",
+    "short_description": "Auto parts",
+    "full_description": "Auto shops and household goods",
+    "normalized_category": "Auto",
+    "subcategory": "Auto Parts"
+  },
+  {
+    "mcc": 5532,
+    "group_code": "CV",
+    "group_name": "Cars and vehicles",
+    "short_description": "Tires",
+    "full_description": "Automotive Tire Stores",
+    "normalized_category": "Auto",
+    "subcategory": "Tires"
+  },
+  {
+    "mcc": 5533,
+    "group_code": "CV",
+    "group_name": "Cars and vehicles",
+    "short_description": "Auto shops",
+    "full_description": "Automotive Parts and Accessories Stores",
+    "normalized_category": "Auto",
+    "subcategory": "Auto Repair"
+  },
+  {
+    "mcc": 5541,
+    "group_code": "CV",
+    "group_name": "Cars and vehicles",
+    "short_description": "Service Stations",
+    "full_description": "Service Stations (With or Without Ancillary Services)",
+    "normalized_category": "Fuel",
+    "subcategory": "Fuel Stations"
+  },
+  {
+    "mcc": 5542,
+    "group_code": "CV",
+    "group_name": "Cars and vehicles",
+    "short_description": "Gas station",
+    "full_description": "Fuel Dispenser, Automated",
+    "normalized_category": "Fuel",
+    "subcategory": "Automated Fuel"
+  },
+  {
+    "mcc": 5552,
+    "group_code": "CV",
+    "group_name": "Cars and vehicles",
+    "short_description": "Charging stations",
+    "full_description": "Electric car charging stations",
+    "normalized_category": "Fuel",
+    "subcategory": "EV Charging"
+  },
+  {
+    "mcc": 5561,
+    "group_code": "CV",
+    "group_name": "Cars and vehicles",
+    "short_description": "Car dealerships",
+    "full_description": "Camper Dealers, Recreational and Utility Trailers",
+    "normalized_category": "Auto",
+    "subcategory": "Car Dealers"
+  },
+  {
+    "mcc": 5571,
+    "group_code": "CV",
+    "group_name": "Cars and vehicles",
+    "short_description": "Car dealerships",
+    "full_description": "Motorcycle Shops and Dealers",
+    "normalized_category": "Auto",
+    "subcategory": "Motorcycle Dealers"
+  },
+  {
+    "mcc": 5592,
+    "group_code": "CV",
+    "group_name": "Cars and vehicles",
+    "short_description": "Car dealerships",
+    "full_description": "Motor Home Dealers",
+    "normalized_category": "Auto",
+    "subcategory": "Camper / Trailer Dealers"
+  },
+  {
+    "mcc": 5598,
+    "group_code": "CV",
+    "group_name": "Cars and vehicles",
+    "short_description": "Car dealerships",
+    "full_description": "Snowmobile Dealers",
+    "normalized_category": "Auto",
+    "subcategory": "Snowmobile / ATV Dealers"
+  },
+  {
+    "mcc": 5599,
+    "group_code": "CV",
+    "group_name": "Cars and vehicles",
+    "short_description": "Car dealerships",
+    "full_description": "Miscellaneous Automotive, Aircraft, and Farm Equipment Dealers",
+    "normalized_category": "Auto",
+    "subcategory": "Other Vehicle Dealers"
+  },
+  {
+    "mcc": 5611,
+    "group_code": "CLS",
+    "group_name": "Clothing stores",
+    "short_description": "Mens clothing",
+    "full_description": "Men’s and Boys’ Clothing and Accessories Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Mens Clothing"
+  },
+  {
+    "mcc": 5621,
+    "group_code": "CLS",
+    "group_name": "Clothing stores",
+    "short_description": "Womens clothing",
+    "full_description": "Women’s Ready to Wear Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Womens Clothing"
+  },
+  {
+    "mcc": 5631,
+    "group_code": "CLS",
+    "group_name": "Clothing stores",
+    "short_description": "Clothing stores",
+    "full_description": "Women’s Accessory and Specialty Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Apparel"
+  },
+  {
+    "mcc": 5641,
+    "group_code": "CLS",
+    "group_name": "Clothing stores",
+    "short_description": "Baby clothes",
+    "full_description": "Children’s and Infants’ Wear Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Children Clothing"
+  },
+  {
+    "mcc": 5651,
+    "group_code": "CLS",
+    "group_name": "Clothing stores",
+    "short_description": "Clothes",
+    "full_description": "Family Clothing Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Clothing"
+  },
+  {
+    "mcc": 5655,
+    "group_code": "CLS",
+    "group_name": "Clothing stores",
+    "short_description": "Sportswear",
+    "full_description": "Sports Apparel, and Riding Apparel Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Sportswear"
+  },
+  {
+    "mcc": 5661,
+    "group_code": "CLS",
+    "group_name": "Clothing stores",
+    "short_description": "Shoes",
+    "full_description": "Shoe Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Shoes"
+  },
+  {
+    "mcc": 5691,
+    "group_code": "CLS",
+    "group_name": "Clothing stores",
+    "short_description": "Clothes",
+    "full_description": "Men’s and Women’s Clothing Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Clothing"
+  },
+  {
+    "mcc": 5697,
+    "group_code": "CLS",
+    "group_name": "Clothing stores",
+    "short_description": "Atelier",
+    "full_description": "Alterations, Mending, Seamstresses, Tailors",
+    "normalized_category": "Shopping",
+    "subcategory": "Tailor / Alterations"
+  },
+  {
+    "mcc": 5699,
+    "group_code": "CLS",
+    "group_name": "Clothing stores",
+    "short_description": "Accessories",
+    "full_description": "Accessory and Apparel Stores - Miscellaneous",
+    "normalized_category": "Shopping",
+    "subcategory": "Accessories"
+  },
+  {
+    "mcc": 5712,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Furniture",
+    "full_description": "Equipment, Furniture and Home Furnishings Stores (except Appliances)",
+    "normalized_category": "Shopping",
+    "subcategory": "Furniture"
+  },
+  {
+    "mcc": 5713,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Floor coverings",
+    "full_description": "Floor Covering Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Floor Coverings"
+  },
+  {
+    "mcc": 5714,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Curtains",
+    "full_description": "Drapery, Upholstery and Window Coverings Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Curtains"
+  },
+  {
+    "mcc": 5719,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Furniture",
+    "full_description": "Miscellaneous House Furnishing Specialty Shops",
+    "normalized_category": "Shopping",
+    "subcategory": "Home Furnishings"
+  },
+  {
+    "mcc": 5722,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Household appliance",
+    "full_description": "Household Appliance Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Appliances"
+  },
+  {
+    "mcc": 5732,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Household appliance",
+    "full_description": "Electronics Sales",
+    "normalized_category": "Shopping",
+    "subcategory": "Electronics"
+  },
+  {
+    "mcc": 5733,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Musical Instruments",
+    "full_description": "Music Stores - Musical Instruments, Pianos and Sheet Music",
+    "normalized_category": "Shopping",
+    "subcategory": "Musical Instruments"
+  },
+  {
+    "mcc": 5734,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Computer Software",
+    "full_description": "Computer Software Stores",
+    "normalized_category": "Subscriptions",
+    "subcategory": "Software"
+  },
+  {
+    "mcc": 5735,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Record Shops",
+    "full_description": "Record Shops",
+    "normalized_category": "Shopping",
+    "subcategory": "Music / Media"
+  },
+  {
+    "mcc": 5811,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Caterers",
+    "full_description": "Caterers",
+    "normalized_category": "Restaurants",
+    "subcategory": "Catering"
+  },
+  {
+    "mcc": 5812,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Cafe. Restaurants",
+    "full_description": "Eating Places and Restaurants ",
+    "normalized_category": "Restaurants",
+    "subcategory": "Restaurants"
+  },
+  {
+    "mcc": 5813,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Bars",
+    "full_description": "Bars, Cocktail Lounges, Discotheques, Nightclubs and Taverns-Drinking Places (Alcoholic Beverages)",
+    "normalized_category": "Restaurants",
+    "subcategory": "Bars"
+  },
+  {
+    "mcc": 5814,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Fast Food",
+    "full_description": "Fast Food Restaurants",
+    "normalized_category": "Restaurants",
+    "subcategory": "Fast Food"
+  },
+  {
+    "mcc": 5815,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Digital Goods",
+    "full_description": "Digital Goods: Books, Movies, Music",
+    "normalized_category": "Subscriptions",
+    "subcategory": "Digital Goods"
+  },
+  {
+    "mcc": 5816,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Games",
+    "full_description": "Digital Goods: Games",
+    "normalized_category": "Subscriptions",
+    "subcategory": "Games"
+  },
+  {
+    "mcc": 5817,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Applications",
+    "full_description": "Digital Goods: Applications (Excludes Games)",
+    "normalized_category": "Subscriptions",
+    "subcategory": "Applications"
+  },
+  {
+    "mcc": 5818,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Digital Goods",
+    "full_description": "Digital Goods: Large Digital Goods Merchant / Digital Goods: Multi-Category",
+    "normalized_category": "Subscriptions",
+    "subcategory": "Digital Goods"
+  },
+  {
+    "mcc": 5912,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Drug Stores",
+    "full_description": "Drug Stores and Pharmacies",
+    "normalized_category": "Health",
+    "subcategory": "Pharmacies"
+  },
+  {
+    "mcc": 5921,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Alcohol",
+    "full_description": "Package Stores - Beer, Wine and Liquor",
+    "normalized_category": "Food",
+    "subcategory": "Alcohol"
+  },
+  {
+    "mcc": 5931,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Second Hand",
+    "full_description": "Second Hand Stores, Used Merchandise Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Second Hand"
+  },
+  {
+    "mcc": 5932,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Antiques",
+    "full_description": "Antique Shops-Sales, Repairs and Restoration Services",
+    "normalized_category": "Shopping",
+    "subcategory": "Antiques"
+  },
+  {
+    "mcc": 5940,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Bicycles",
+    "full_description": "Bicycle Shops-Sales and Service",
+    "normalized_category": "Shopping",
+    "subcategory": "Bicycles"
+  },
+  {
+    "mcc": 5941,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Sports goods",
+    "full_description": "Sporting Goods Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Sporting Goods"
+  },
+  {
+    "mcc": 5942,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Book Stores",
+    "full_description": "Book Stores",
+    "normalized_category": "Education",
+    "subcategory": "Books / Education"
+  },
+  {
+    "mcc": 5943,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Stationery",
+    "full_description": "Office, School Supply and Stationery Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Stationery"
+  },
+  {
+    "mcc": 5944,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Clock",
+    "full_description": "Clock, Jewelry, Watch and Silverware Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Jewelry / Watches"
+  },
+  {
+    "mcc": 5945,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Toys",
+    "full_description": "Game, Toy and Hobby Shops",
+    "normalized_category": "Shopping",
+    "subcategory": "Toys"
+  },
+  {
+    "mcc": 5946,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Photo goods",
+    "full_description": "Camera and Photographic Supply Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Photo Goods"
+  },
+  {
+    "mcc": 5947,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Souvenirs",
+    "full_description": "Card, Gift, Novelty and Souvenir Shops",
+    "normalized_category": "Shopping",
+    "subcategory": "Souvenirs"
+  },
+  {
+    "mcc": 5948,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Leather Products",
+    "full_description": "Leather Goods and Luggage Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Leather Goods"
+  },
+  {
+    "mcc": 5949,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Sewing supplies",
+    "full_description": "Fabric, Needlework, Piece Goods and Sewing Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Sewing Supplies"
+  },
+  {
+    "mcc": 5950,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Crystal / glassware",
+    "full_description": "Crystal and Glassware Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Glassware"
+  },
+  {
+    "mcc": 5961,
+    "group_code": "MTS",
+    "group_name": "Mail / Telephone Sales",
+    "short_description": "Goods by mail",
+    "full_description": "Mail Order Houses Including Catalog Order Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Mail Order"
+  },
+  {
+    "mcc": 5962,
+    "group_code": "MTS",
+    "group_name": "Mail / Telephone Sales",
+    "short_description": "Travels",
+    "full_description": "Direct Marketing - Travel Related Arrangement Services",
+    "normalized_category": "Travel",
+    "subcategory": "Travel Booking"
+  },
+  {
+    "mcc": 5964,
+    "group_code": "MTS",
+    "group_name": "Mail / Telephone Sales",
+    "short_description": "Goods by mail",
+    "full_description": "Direct Marketing-Catalog Merchants",
+    "normalized_category": "Shopping",
+    "subcategory": "Mail Order"
+  },
+  {
+    "mcc": 5965,
+    "group_code": "MTS",
+    "group_name": "Mail / Telephone Sales",
+    "short_description": "Goods by mail",
+    "full_description": "Direct Marketing - Combination Catalog and Retail Merchant",
+    "normalized_category": "Shopping",
+    "subcategory": "Mail Order"
+  },
+  {
+    "mcc": 5966,
+    "group_code": "MTS",
+    "group_name": "Mail / Telephone Sales",
+    "short_description": "Goods by mail",
+    "full_description": "Direct Marketing - Outbound Telemarketing Merchants",
+    "normalized_category": "Shopping",
+    "subcategory": "Outbound Telemarketing"
+  },
+  {
+    "mcc": 5967,
+    "group_code": "MTS",
+    "group_name": "Mail / Telephone Sales",
+    "short_description": "Information Services",
+    "full_description": "Direct Marketing - Inbound Telemarketing Merchants",
+    "normalized_category": "Shopping",
+    "subcategory": "Info Services"
+  },
+  {
+    "mcc": 5968,
+    "group_code": "MTS",
+    "group_name": "Mail / Telephone Sales",
+    "short_description": "Subscriptions",
+    "full_description": "Direct Marketing - Continuity / Subscription Merchants",
+    "normalized_category": "Subscriptions",
+    "subcategory": "Subscriptions"
+  },
+  {
+    "mcc": 5969,
+    "group_code": "MTS",
+    "group_name": "Mail / Telephone Sales",
+    "short_description": "Goods by mail",
+    "full_description": "Direct Marketing - Other Direct Marketers",
+    "normalized_category": "Shopping",
+    "subcategory": "Direct Marketing"
+  },
+  {
+    "mcc": 5970,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Art goods",
+    "full_description": "Artist Supply Stores, Craft Shops",
+    "normalized_category": "Shopping",
+    "subcategory": "Art Supplies"
+  },
+  {
+    "mcc": 5971,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Galleries",
+    "full_description": "Art Dealers and Galleries",
+    "normalized_category": "Shopping",
+    "subcategory": "Art Galleries"
+  },
+  {
+    "mcc": 5975,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Hearing Aids",
+    "full_description": "Hearing Aids - Sales, Service, Supply Stores",
+    "normalized_category": "Health",
+    "subcategory": "Hearing Aids"
+  },
+  {
+    "mcc": 5976,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Prostheses",
+    "full_description": "Orthopedic Goods - Artificial Limb Stores",
+    "normalized_category": "Health",
+    "subcategory": "Prostheses"
+  },
+  {
+    "mcc": 5977,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Cosmetics",
+    "full_description": "Cosmetic Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Cosmetics"
+  },
+  {
+    "mcc": 5983,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Fuel",
+    "full_description": "Fuel Dealers - Coal, Fuel Oil, Liquefied Petroleum, Wood",
+    "normalized_category": "Fuel",
+    "subcategory": "Bulk Fuel"
+  },
+  {
+    "mcc": 5992,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Florists",
+    "full_description": "Florists",
+    "normalized_category": "Shopping",
+    "subcategory": "Florists"
+  },
+  {
+    "mcc": 5993,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Tobacco products",
+    "full_description": "Cigar Stores and Stands",
+    "normalized_category": "Shopping",
+    "subcategory": "Tobacco"
+  },
+  {
+    "mcc": 5994,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Newspapers. Magazines",
+    "full_description": "News Dealers and Newsstands",
+    "normalized_category": "Shopping",
+    "subcategory": "Newsstands"
+  },
+  {
+    "mcc": 5995,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Pet supplies",
+    "full_description": "Pet Shops, Pet Food and Supplies",
+    "normalized_category": "Shopping",
+    "subcategory": "Pet Supplies"
+  },
+  {
+    "mcc": 5997,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Razors",
+    "full_description": "Electric Razor Stores - Sales and Service",
+    "normalized_category": "Shopping",
+    "subcategory": "Razors"
+  },
+  {
+    "mcc": 5998,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Tents",
+    "full_description": "Tent and Awning Shops",
+    "normalized_category": "Shopping",
+    "subcategory": "Tents"
+  },
+  {
+    "mcc": 5999,
+    "group_code": "MS",
+    "group_name": "Miscellaneous Stores",
+    "short_description": "Miscellaneous",
+    "full_description": "Miscellaneous and Specialty Retail Stores",
+    "normalized_category": "Shopping",
+    "subcategory": "Misc Retail"
+  },
+  {
+    "mcc": 6011,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Сashier's office",
+    "full_description": "Member Financial Institution - Automated Cash Disbursements",
+    "normalized_category": "Financial Services",
+    "subcategory": "ATM / Cash"
+  },
+  {
+    "mcc": 6012,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Financial services",
+    "full_description": "Member Financial Institution - Merchandise And Services",
+    "normalized_category": "Financial Services",
+    "subcategory": "Financial Institutions"
+  },
+  {
+    "mcc": 6050,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Quasi Cash",
+    "full_description": "Quasi Cash - Member Financial Institution",
+    "normalized_category": "Financial Services",
+    "subcategory": "Quasi Cash"
+  },
+  {
+    "mcc": 6051,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Quasi Cash",
+    "full_description": "Quasi Cash - Merchant",
+    "normalized_category": "Financial Services",
+    "subcategory": "Quasi Cash"
+  },
+  {
+    "mcc": 6300,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Insurance",
+    "full_description": "Insurance Sales, Underwriting and Premiums",
+    "normalized_category": "Insurance",
+    "subcategory": "Insurance"
+  },
+  {
+    "mcc": 6381,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Insurance",
+    "full_description": "Insurance - Premiums",
+    "normalized_category": "Insurance",
+    "subcategory": "Insurance"
+  },
+  {
+    "mcc": 6399,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Insurance",
+    "full_description": "Insurance",
+    "normalized_category": "Insurance",
+    "subcategory": "Insurance"
+  },
+  {
+    "mcc": 6513,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Rental Property",
+    "full_description": "Real Estate Agents and Managers - Rentals",
+    "normalized_category": "Housing",
+    "subcategory": "Rent / Property"
+  },
+  {
+    "mcc": 6529,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Сard replenishment",
+    "full_description": "Remote Stored Value Load - Member Financial Institution",
+    "normalized_category": "Transfers",
+    "subcategory": "Card Top-up"
+  },
+  {
+    "mcc": 6530,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Сard replenishment",
+    "full_description": "Remove Stored Value Load - Merchant",
+    "normalized_category": "Transfers",
+    "subcategory": "Card Top-up"
+  },
+  {
+    "mcc": 6531,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Money transfer",
+    "full_description": "Payment for services - money transfers",
+    "normalized_category": "Transfers",
+    "subcategory": "Money Transfer"
+  },
+  {
+    "mcc": 6532,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Money transfer",
+    "full_description": "Payment Transaction - Financial Institution",
+    "normalized_category": "Transfers",
+    "subcategory": "Money Transfer"
+  },
+  {
+    "mcc": 6533,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Money transfer",
+    "full_description": "Payment operation - seller",
+    "normalized_category": "Transfers",
+    "subcategory": "Money Transfer"
+  },
+  {
+    "mcc": 6534,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Money transfer",
+    "full_description": "Money Transfer - Financial Institution",
+    "normalized_category": "Transfers",
+    "subcategory": "Money Transfer"
+  },
+  {
+    "mcc": 6535,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Money transfer",
+    "full_description": "Value Purchase - Member Financial Institution",
+    "normalized_category": "Transfers",
+    "subcategory": "Money Transfer"
+  },
+  {
+    "mcc": 6536,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Money transfer",
+    "full_description": "MoneySend Intracountry",
+    "normalized_category": "Transfers",
+    "subcategory": "Money Transfer"
+  },
+  {
+    "mcc": 6537,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Money transfer",
+    "full_description": "MoneySend Intercountry",
+    "normalized_category": "Transfers",
+    "subcategory": "Money Transfer"
+  },
+  {
+    "mcc": 6538,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Money transfer",
+    "full_description": "MoneySend Funding",
+    "normalized_category": "Transfers",
+    "subcategory": "Money Transfer"
+  },
+  {
+    "mcc": 6539,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Money transfer",
+    "full_description": "Funding Transaction (Excluding MoneySend)",
+    "normalized_category": "Transfers",
+    "subcategory": "Money Transfer"
+  },
+  {
+    "mcc": 6540,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Money transfer",
+    "full_description": "POI (Point of Interaction) Funding Transactions (Excluding MoneySend)",
+    "normalized_category": "Transfers",
+    "subcategory": "Money Transfer"
+  },
+  {
+    "mcc": 6611,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Money transfer",
+    "full_description": "Overpayments",
+    "normalized_category": "Transfers",
+    "subcategory": "Money Transfer"
+  },
+  {
+    "mcc": 7032,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Recreation",
+    "full_description": "Sporting and Recreational Camps",
+    "normalized_category": "Travel",
+    "subcategory": "Recreation Camps"
+  },
+  {
+    "mcc": 7033,
+    "group_code": "SP",
+    "group_name": "Service provider",
+    "short_description": "Campgrounds",
+    "full_description": "Campgrounds and Trailer Parks",
+    "normalized_category": "Travel",
+    "subcategory": "Campgrounds"
+  },
+  {
+    "mcc": 7210,
+    "group_code": "PS",
+    "group_name": "Personal services",
+    "short_description": "Cleaning",
+    "full_description": "Cleaning, Garment and Laundry Services",
+    "normalized_category": "Personal Services",
+    "subcategory": "Cleaning"
+  },
+  {
+    "mcc": 7211,
+    "group_code": "PS",
+    "group_name": "Personal services",
+    "short_description": "Laundry",
+    "full_description": "Laundry Services - Family and Commercial",
+    "normalized_category": "Personal Services",
+    "subcategory": "Laundry"
+  },
+  {
+    "mcc": 7216,
+    "group_code": "PS",
+    "group_name": "Personal services",
+    "short_description": "Dry Cleaners",
+    "full_description": "Dry Cleaners",
+    "normalized_category": "Personal Services",
+    "subcategory": "Dry Cleaning"
+  },
+  {
+    "mcc": 7217,
+    "group_code": "PS",
+    "group_name": "Personal services",
+    "short_description": "Cleaning",
+    "full_description": "Carpet and Upholstery Cleaning",
+    "normalized_category": "Personal Services",
+    "subcategory": "Carpet / Upholstery Cleaning"
+  },
+  {
+    "mcc": 7221,
+    "group_code": "PS",
+    "group_name": "Personal services",
+    "short_description": "Photographic Studios",
+    "full_description": "Photographic Studios",
+    "normalized_category": "Personal Services",
+    "subcategory": "Photography"
+  },
+  {
+    "mcc": 7230,
+    "group_code": "PS",
+    "group_name": "Personal services",
+    "short_description": "The beauty",
+    "full_description": "Barber and Beauty Shops",
+    "normalized_category": "Personal Services",
+    "subcategory": "Beauty Salon"
+  },
+  {
+    "mcc": 7251,
+    "group_code": "PS",
+    "group_name": "Personal services",
+    "short_description": "Clothing repair",
+    "full_description": "Hat Cleaning Shops, Shoe Repair Shops, Shoe Shine Parlors",
+    "normalized_category": "Personal Services",
+    "subcategory": "Repairs / Alterations"
+  },
+  {
+    "mcc": 7276,
+    "group_code": "PS",
+    "group_name": "Personal services",
+    "short_description": "Taxes",
+    "full_description": "Tax Preparation Service",
+    "normalized_category": "Personal Services",
+    "subcategory": "Tax Preparation"
+  },
+  {
+    "mcc": 7280,
+    "group_code": "PS",
+    "group_name": "Personal services",
+    "short_description": "Hospitals",
+    "full_description": "Hospital Patient - Personal Funds Withdrawal",
+    "normalized_category": "Health",
+    "subcategory": "Hospitals"
+  },
+  {
+    "mcc": 7295,
+    "group_code": "PS",
+    "group_name": "Personal services",
+    "short_description": "Babysitters",
+    "full_description": "Babysitting Services",
+    "normalized_category": "Personal Services",
+    "subcategory": "Childcare"
+  },
+  {
+    "mcc": 7296,
+    "group_code": "PS",
+    "group_name": "Personal services",
+    "short_description": "Clothing rental",
+    "full_description": "Clothing Rental - Costumes, Uniforms and Formal Wear",
+    "normalized_category": "Personal Services",
+    "subcategory": "Clothing Rental"
+  },
+  {
+    "mcc": 7297,
+    "group_code": "PS",
+    "group_name": "Personal services",
+    "short_description": "Massage",
+    "full_description": "Massage Parlors",
+    "normalized_category": "Health",
+    "subcategory": "Massage"
+  },
+  {
+    "mcc": 7298,
+    "group_code": "PS",
+    "group_name": "Personal services",
+    "short_description": "Health and beauty",
+    "full_description": "Health and Beauty Spas",
+    "normalized_category": "Health",
+    "subcategory": "Beauty & Wellness"
+  },
+  {
+    "mcc": 7299,
+    "group_code": "PS",
+    "group_name": "Personal services",
+    "short_description": "Miscellaneous",
+    "full_description": "Other Services",
+    "normalized_category": "Personal Services",
+    "subcategory": "Personal Services"
+  },
+  {
+    "mcc": 7800,
+    "group_code": "ES",
+    "group_name": "Entertainment services",
+    "short_description": "Government Owned Lottery",
+    "full_description": "Government Owned Lottery",
+    "normalized_category": "Entertainment",
+    "subcategory": "Lottery"
+  },
+  {
+    "mcc": 7829,
+    "group_code": "ES",
+    "group_name": "Entertainment services",
+    "short_description": "Video rental",
+    "full_description": "Motion Picture and Video Tape Production and Distribution",
+    "normalized_category": "Entertainment",
+    "subcategory": "Video Rental"
+  },
+  {
+    "mcc": 7832,
+    "group_code": "ES",
+    "group_name": "Entertainment services",
+    "short_description": "Cinemas",
+    "full_description": "Motion Picture Theaters",
+    "normalized_category": "Entertainment",
+    "subcategory": "Cinema"
+  },
+  {
+    "mcc": 7833,
+    "group_code": "ES",
+    "group_name": "Entertainment services",
+    "short_description": "Cinemas",
+    "full_description": "Express Payment Service — Motion Picture Theater",
+    "normalized_category": "Entertainment",
+    "subcategory": "Cinema"
+  },
+  {
+    "mcc": 7841,
+    "group_code": "ES",
+    "group_name": "Entertainment services",
+    "short_description": "Video rental",
+    "full_description": "DVD/Video Tape Rental Stores",
+    "normalized_category": "Entertainment",
+    "subcategory": "Video Rental"
+  },
+  {
+    "mcc": 7911,
+    "group_code": "ES",
+    "group_name": "Entertainment services",
+    "short_description": "Dance studios. Dance schools",
+    "full_description": "Dance Halls, Schools and Studios",
+    "normalized_category": "Entertainment",
+    "subcategory": "Dance / Classes"
+  },
+  {
+    "mcc": 7922,
+    "group_code": "ES",
+    "group_name": "Entertainment services",
+    "short_description": "Tickets",
+    "full_description": "Theatrical Producers (Except Motion Pictures), Ticket Agencies",
+    "normalized_category": "Entertainment",
+    "subcategory": "Tickets"
+  },
+  {
+    "mcc": 7929,
+    "group_code": "ES",
+    "group_name": "Entertainment services",
+    "short_description": "Music bands. Orchestras",
+    "full_description": "Bands, Orchestras and Miscellaneous Entertainers",
+    "normalized_category": "Entertainment",
+    "subcategory": "Live Music"
+  },
+  {
+    "mcc": 7932,
+    "group_code": "ES",
+    "group_name": "Entertainment services",
+    "short_description": "Billiard",
+    "full_description": "Pool and Billiard Establishments",
+    "normalized_category": "Entertainment",
+    "subcategory": "Billiards"
+  },
+  {
+    "mcc": 7933,
+    "group_code": "ES",
+    "group_name": "Entertainment services",
+    "short_description": "Bowling clubs",
+    "full_description": "Bowling Alleys",
+    "normalized_category": "Entertainment",
+    "subcategory": "Bowling"
+  },
+  {
+    "mcc": 7941,
+    "group_code": "ES",
+    "group_name": "Entertainment services",
+    "short_description": "Sports clubs",
+    "full_description": "Athletic Fields, Commercial Sports, Professional Sports Clubs, Sports Promoters",
+    "normalized_category": "Entertainment",
+    "subcategory": "Sports Clubs"
+  },
+  {
+    "mcc": 7991,
+    "group_code": "ES",
+    "group_name": "Entertainment services",
+    "short_description": "Tourism",
+    "full_description": "Tourist Attractions and Exhibits",
+    "normalized_category": "Entertainment",
+    "subcategory": "Tourism"
+  },
+  {
+    "mcc": 7992,
+    "group_code": "ES",
+    "group_name": "Entertainment services",
+    "short_description": "Golf",
+    "full_description": "Golf Courses, Public",
+    "normalized_category": "Entertainment",
+    "subcategory": "Golf"
+  },
+  {
+    "mcc": 7993,
+    "group_code": "ES",
+    "group_name": "Entertainment services",
+    "short_description": "Videogames",
+    "full_description": "Video Amusement Game Supplies",
+    "normalized_category": "Entertainment",
+    "subcategory": "Video Games"
+  },
+  {
+    "mcc": 7994,
+    "group_code": "ES",
+    "group_name": "Entertainment services",
+    "short_description": "Videogames",
+    "full_description": "Video Game Arcades and Establishments",
+    "normalized_category": "Entertainment",
+    "subcategory": "Video Games"
+  },
+  {
+    "mcc": 7995,
+    "group_code": "ES",
+    "group_name": "Entertainment services",
+    "short_description": "Gambling",
+    "full_description": "Gambling Transactions, Betting",
+    "normalized_category": "Entertainment",
+    "subcategory": "Gambling"
+  },
+  {
+    "mcc": 7996,
+    "group_code": "ES",
+    "group_name": "Entertainment services",
+    "short_description": "Entertainment",
+    "full_description": "Amusement Parks, Carnivals, Circuses, Fortune Tellers",
+    "normalized_category": "Entertainment",
+    "subcategory": "Entertainment"
+  },
+  {
+    "mcc": 7997,
+    "group_code": "ES",
+    "group_name": "Entertainment services",
+    "short_description": "Entertainment and sport",
+    "full_description": "Clubs-Country Clubs, Membership (Athletic, Recreation, Sports), Private Golf Courses",
+    "normalized_category": "Entertainment",
+    "subcategory": "Leisure & Sport"
+  },
+  {
+    "mcc": 7998,
+    "group_code": "ES",
+    "group_name": "Entertainment services",
+    "short_description": "Aquariums. Dolphinariums",
+    "full_description": "Aquariums, Dolphinariums, Zoos and Seaquariums",
+    "normalized_category": "Entertainment",
+    "subcategory": "Aquariums / Dolphinariums"
+  },
+  {
+    "mcc": 7999,
+    "group_code": "ES",
+    "group_name": "Entertainment services",
+    "short_description": "Entertainment and sport",
+    "full_description": "Recreation Services",
+    "normalized_category": "Entertainment",
+    "subcategory": "Leisure & Sport"
+  },
+  {
+    "mcc": 8011,
+    "group_code": "PFS",
+    "group_name": "Professional services",
+    "short_description": "Medicine",
+    "full_description": "Doctors",
+    "normalized_category": "Health",
+    "subcategory": "General Practice"
+  },
+  {
+    "mcc": 8021,
+    "group_code": "PFS",
+    "group_name": "Professional services",
+    "short_description": "Dentistry",
+    "full_description": "Dentists and Orthodontists",
+    "normalized_category": "Health",
+    "subcategory": "Dentistry"
+  },
+  {
+    "mcc": 8031,
+    "group_code": "PFS",
+    "group_name": "Professional services",
+    "short_description": "Medicine",
+    "full_description": "Osteopathic Physicians",
+    "normalized_category": "Health",
+    "subcategory": "Osteopathy"
+  },
+  {
+    "mcc": 8041,
+    "group_code": "PFS",
+    "group_name": "Professional services",
+    "short_description": "Chiropractors",
+    "full_description": "Chiropractors",
+    "normalized_category": "Health",
+    "subcategory": "Chiropractors"
+  },
+  {
+    "mcc": 8042,
+    "group_code": "PFS",
+    "group_name": "Professional services",
+    "short_description": "Optics",
+    "full_description": "Optometrists and Ophthalmologists",
+    "normalized_category": "Health",
+    "subcategory": "Opticians"
+  },
+  {
+    "mcc": 8043,
+    "group_code": "PFS",
+    "group_name": "Professional services",
+    "short_description": "Optics",
+    "full_description": "Opticians, Optical Goods and Eyeglasses",
+    "normalized_category": "Health",
+    "subcategory": "Opticians"
+  },
+  {
+    "mcc": 8044,
+    "group_code": "PFS",
+    "group_name": "Professional services",
+    "short_description": "Optics",
+    "full_description": "Optical Goods and Eyeglasses",
+    "normalized_category": "Health",
+    "subcategory": "Opticians"
+  },
+  {
+    "mcc": 8049,
+    "group_code": "PFS",
+    "group_name": "Professional services",
+    "short_description": "Podiatrists",
+    "full_description": "Chiropodists, Podiatrists",
+    "normalized_category": "Health",
+    "subcategory": "Specialists"
+  },
+  {
+    "mcc": 8050,
+    "group_code": "PFS",
+    "group_name": "Professional services",
+    "short_description": "Caregiver / Nurse",
+    "full_description": "Nursing and Personal Care Facilities",
+    "normalized_category": "Health",
+    "subcategory": "Nursing / Care"
+  },
+  {
+    "mcc": 8062,
+    "group_code": "PFS",
+    "group_name": "Professional services",
+    "short_description": "Hospitals",
+    "full_description": "Hospitals",
+    "normalized_category": "Health",
+    "subcategory": "Hospitals"
+  },
+  {
+    "mcc": 8071,
+    "group_code": "PFS",
+    "group_name": "Professional services",
+    "short_description": "Medicine and dentistry",
+    "full_description": "Dental and Medical Laboratories",
+    "normalized_category": "Health",
+    "subcategory": "Medical / Dental Labs"
+  },
+  {
+    "mcc": 8099,
+    "group_code": "PFS",
+    "group_name": "Professional services",
+    "short_description": "Medical services",
+    "full_description": "Health Practitioners, Medical Services",
+    "normalized_category": "Health",
+    "subcategory": "Medical Services"
+  },
+  {
+    "mcc": 8211,
+    "group_code": "PFS",
+    "group_name": "Professional services",
+    "short_description": "School",
+    "full_description": "Schools, Elementary and Secondary",
+    "normalized_category": "Education",
+    "subcategory": "Schools"
+  },
+  {
+    "mcc": 8220,
+    "group_code": "PFS",
+    "group_name": "Professional services",
+    "short_description": "Education. University",
+    "full_description": "Colleges, Universities, Professional Schools and Junior Colleges",
+    "normalized_category": "Education",
+    "subcategory": "University"
+  },
+  {
+    "mcc": 8241,
+    "group_code": "PFS",
+    "group_name": "Professional services",
+    "short_description": "Schools, Correspondence",
+    "full_description": "Schools, Correspondence",
+    "normalized_category": "Education",
+    "subcategory": "Correspondence Schools"
+  },
+  {
+    "mcc": 8244,
+    "group_code": "PFS",
+    "group_name": "Professional services",
+    "short_description": "Education. Business",
+    "full_description": "Schools, Business and Secretarial ",
+    "normalized_category": "Education",
+    "subcategory": "Business Schools"
+  },
+  {
+    "mcc": 8249,
+    "group_code": "PFS",
+    "group_name": "Professional services",
+    "short_description": "Education",
+    "full_description": "Schools, Trade and Vocational",
+    "normalized_category": "Education",
+    "subcategory": "Education"
+  },
+  {
+    "mcc": 8299,
+    "group_code": "PFS",
+    "group_name": "Professional services",
+    "short_description": "Education",
+    "full_description": "Schools And Educational Services",
+    "normalized_category": "Education",
+    "subcategory": "Education Services"
+  },
+  {
+    "mcc": 8351,
+    "group_code": "PFS",
+    "group_name": "Professional services",
+    "short_description": "Kindergarten",
+    "full_description": "Child Care Services",
+    "normalized_category": "Education",
+    "subcategory": "Childcare / Kindergarten"
+  },
+  {
+    "mcc": 9211,
+    "group_code": "GS",
+    "group_name": "Government Services",
+    "short_description": "Court",
+    "full_description": "Court Costs Including Alimony and Child Support",
+    "normalized_category": "Government",
+    "subcategory": "Court Fees"
+  },
+  {
+    "mcc": 9222,
+    "group_code": "GS",
+    "group_name": "Government Services",
+    "short_description": "Fines",
+    "full_description": "Fines",
+    "normalized_category": "Government",
+    "subcategory": "Fines"
+  },
+  {
+    "mcc": 9311,
+    "group_code": "GS",
+    "group_name": "Government Services",
+    "short_description": "Taxes",
+    "full_description": "Tax Payments",
+    "normalized_category": "Government",
+    "subcategory": "Taxes"
+  },
+  {
+    "mcc": 9399,
+    "group_code": "GS",
+    "group_name": "Government Services",
+    "short_description": "Government Services",
+    "full_description": "Government Services",
+    "normalized_category": "Government",
+    "subcategory": "Government Services"
+  },
+  {
+    "mcc": 9402,
+    "group_code": "GS",
+    "group_name": "Government Services",
+    "short_description": "Mail",
+    "full_description": "Postal Services - Government Only",
+    "normalized_category": "Government",
+    "subcategory": "Postal Services"
+  },
+  {
+    "mcc": 9411,
+    "group_code": "GS",
+    "group_name": "Government Services",
+    "short_description": "Government Services",
+    "full_description": "Government loan payments",
+    "normalized_category": "Government",
+    "subcategory": "Government Services"
+  }
+]

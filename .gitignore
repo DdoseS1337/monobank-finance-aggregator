@@ -1,0 +1,56 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# env — НІКОЛИ не комітити, лише .env.example
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# build output
+dist/
+build/
+.next/
+out/
+/generated/prisma/
+backend/generated/
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# testing / coverage
+coverage/
+*.lcov
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+*.pem
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# vercel
+.vercel
+
+# Claude Code / agent tooling — локальне
+.claude/settings.local.json
+.claude/skills/
+.agents/
+skills-lock.json

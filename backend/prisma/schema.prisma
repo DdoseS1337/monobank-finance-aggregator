@@ -1,0 +1,121 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TransactionType {
+  DEBIT
+  CREDIT
+  TRANSFER
+  HOLD
+}
+
+model MccReference {
+  mcc                Int      @id
+  groupCode          String   @map("group_code")
+  groupName          String   @map("group_name")
+  shortDescription   String   @map("short_description")
+  fullDescription    String   @map("full_description")
+  normalizedCategory String   @map("normalized_category")
+  subcategory        String
+  isActive           Boolean  @default(true) @map("is_active")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  @@map("mcc_reference")
+}
+
+model Account {
+  id                String    @id @default(uuid()) @db.Uuid
+  userId            String    @map("user_id") @db.Uuid
+  source            String
+  externalAccountId String    @map("external_account_id")
+  name              String?
+  currency          String    @db.VarChar(10)
+  accountType       String?   @map("account_type")
+  balance           Decimal?  @db.Decimal(18, 2)
+  maskedPan         String?   @map("masked_pan")
+  isActive          Boolean   @default(true) @map("is_active")
+  lastSyncedAt      DateTime? @map("last_synced_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  transactions Transaction[]
+
+  @@unique([userId, source, externalAccountId], name: "uq_user_source_external")
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Transaction {
+  id                String          @id @default(uuid()) @db.Uuid
+  userId            String          @map("user_id") @db.Uuid
+  accountId         String?         @map("account_id") @db.Uuid
+  account           Account?        @relation(fields: [accountId], references: [id])
+  source            String
+  externalId        String          @map("external_id")
+  amount            Decimal         @db.Decimal(18, 2)
+  operationAmount   Decimal         @map("operation_amount") @db.Decimal(18, 2)
+  currency          String          @db.VarChar(10)
+  cashbackAmount    Decimal         @default(0) @map("cashback_amount") @db.Decimal(18, 2)
+  commissionRate    Decimal         @default(0) @map("commission_rate") @db.Decimal(18, 2)
+  balance           Decimal         @db.Decimal(18, 2)
+  descriptionRaw    String          @map("description_raw")
+  merchantNameClean String?         @map("merchant_name_clean")
+  mcc               Int?
+  mccCategory       String?         @map("mcc_category")
+  transactionType   TransactionType @map("transaction_type")
+  transactionTime   DateTime        @map("transaction_time")
+  rawData           Json            @map("raw_data")
+  createdAt         DateTime        @default(now()) @map("created_at")
+
+  @@unique([source, externalId], name: "uq_source_external_id")
+  @@index([userId])
+  @@index([accountId])
+  @@index([transactionTime])
+  @@index([mcc])
+  @@map("transactions")
+}
+
+model MerchantRule {
+  id          String   @id @default(uuid()) @db.Uuid
+  pattern     String
+  matchType   String   @map("match_type")
+  field       String
+  category    String
+  subcategory String?
+  priority    Int      @default(100)
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([isActive, priority])
+  @@map("merchant_rules")
+}
+
+model AiThread {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  title         String?
+  model         String?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  lastMessageAt DateTime @default(now()) @map("last_message_at")
+
+  messages AiMessage[]
+
+  @@index([userId, lastMessageAt(sort: Desc)])
+  @@map("ai_threads")
+}
+
+model AiMessage {
+  id        String   @id @default(uuid()) @db.Uuid
+  threadId  String   @map("thread_id") @db.Uuid
+  thread    AiThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  role      String // 'user' | 'assistant' | 'system'
+  parts     Json // UIMessage parts array (text + tool-calls + tool-results)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([threadId, createdAt])
+  @@map("ai_messages")
+}
