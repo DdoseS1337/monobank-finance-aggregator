@@ -1,0 +1,7 @@
+scenario,description,expectedDelta,actualDelta,identityHolds,errPrice,errVolume,errCross,errMixIn,errMixOut
+price-only,"Same merchant, +50% avg ticket, same count.",500,500,true,0,0,0,0,0
+volume-only,"Same merchant, same ticket, +50% transaction count.",500,500,true,0,0,0,0,0
+mix-in-only,"New merchant appears in period B.",800,800,true,0,0,0,0,0
+mix-out-only,"Merchant from period A is gone in period B.",-600,-600,true,0,0,0,0,0
+cross-term,"Both price and volume up — checks the cross interaction term.",1250,1250,true,0,0,0,0,0
+realistic-mix,"One merchant grows, one drops in price, one appears, one disappears.",620,620,true,0,0,0,0,0

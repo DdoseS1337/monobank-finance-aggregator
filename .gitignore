@@ -54,3 +54,9 @@ Thumbs.db
 .claude/skills/
 .agents/
 skills-lock.json
+
+*.docx
+*.pptx
+# Rendered mermaid diagrams (regenerate via 'npm --prefix backend run docs:render')
+docs/diagrams/rendered/
+

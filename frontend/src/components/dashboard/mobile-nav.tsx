@@ -3,94 +3,57 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Brain, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useToken } from '@/hooks/use-token';
-
-const navItems = [
-  { label: 'Огляд', href: '/dashboard' },
-  { label: 'Аналітика', href: '/dashboard/analytics' },
-  { label: 'Транзакції', href: '/dashboard/transactions' },
-  { label: 'Патерни', href: '/dashboard/patterns' },
-  { label: 'Інсайти', href: '/dashboard/insights' },
-  { label: 'Прогноз', href: '/dashboard/forecast' },
-  { label: 'Асистент', href: '/dashboard/assistant' },
-];
+import { NAV_ITEMS_FOR_MOBILE } from './sidebar';
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const { clearToken } = useToken();
 
   return (
     <div className="md:hidden">
-      {/* Top bar */}
-      <div className="flex items-center justify-between h-14 px-4 border-b border-border bg-card">
+      <div className="flex h-14 items-center justify-between border-b border-border bg-card px-4">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-xs">₴</span>
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary">
+            <Brain className="h-3.5 w-3.5 text-primary-foreground" />
           </div>
-          <span className="font-semibold">ФінДашборд</span>
+          <span className="font-semibold">PFOS</span>
         </div>
         <button
-          onClick={() => setOpen(!open)}
+          onClick={() => setOpen((v) => !v)}
           aria-label={open ? 'Закрити меню' : 'Відкрити меню'}
           aria-expanded={open}
-          className="p-2 hover:bg-muted rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="rounded-lg p-2 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          {open ? (
-            <svg aria-hidden="true" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          ) : (
-            <svg aria-hidden="true" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          )}
+          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </div>
 
-      {/* Dropdown */}
       {open && (
-        <div className="border-b border-border bg-card px-4 py-2 space-y-1">
-          {navItems.map((item) => {
-            const isActive =
-              item.href === '/dashboard'
-                ? pathname === '/dashboard'
-                : pathname.startsWith(item.href);
+        <div className="space-y-1 border-b border-border bg-card px-4 py-2">
+          {NAV_ITEMS_FOR_MOBILE.map((item) => {
+            const Icon = item.icon;
+            const active = item.exact
+              ? pathname === item.href
+              : pathname.startsWith(item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
                 className={cn(
-                  'block px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                  isActive
+                  'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                  active
                     ? 'bg-primary/10 text-primary'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                 )}
               >
+                <Icon className="h-5 w-5 shrink-0" />
                 {item.label}
               </Link>
             );
           })}
-          <Link
-            href="/setup"
-            onClick={() => setOpen(false)}
-            className="block px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted"
-          >
-            Синхронізувати ще
-          </Link>
-          <button
-            onClick={() => {
-              if (window.confirm('Змінити токен? Ви будете перенаправлені на сторінку налаштувань.')) {
-                clearToken();
-                setOpen(false);
-              }
-            }}
-            className="block w-full text-left px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-          >
-            Змінити токен
-          </button>
         </div>
       )}
     </div>
