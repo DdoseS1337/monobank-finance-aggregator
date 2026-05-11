@@ -9,6 +9,7 @@ import { PrismaModule } from '../shared-kernel/prisma/prisma.module';
 import { QueueModule } from '../shared-kernel/queues/queue.module';
 import { EventsModule } from '../shared-kernel/events/events.module';
 import { AiKernelModule } from '../shared-kernel/ai/ai-kernel.module';
+import { AuthModule } from '../auth/auth.module';
 import { EvalModule } from './eval.module';
 import { ForecastEvaluator, ForecastRollingReport } from './forecast-evaluator';
 import { ToolSuccessReport } from './tool-success-rate';
@@ -21,6 +22,7 @@ import { RecommendationAcceptanceSimulator } from './recommendation-acceptance';
     QueueModule,
     EventsModule,
     AiKernelModule,
+    AuthModule,
     EvalModule,
   ],
 })

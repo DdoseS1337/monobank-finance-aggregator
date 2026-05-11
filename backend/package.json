@@ -23,7 +23,7 @@
     "prisma:seed": "tsx prisma/seed.ts",
     "worker:start": "node dist/workers/main",
     "worker:dev": "tsx watch src/workers/main.ts",
-    "eval": "tsx src/eval/eval-cli.ts",
+    "eval": "ts-node --transpile-only -r tsconfig-paths/register src/eval/eval-cli.ts",
     "docs:openapi": "tsx scripts/export-openapi.ts",
     "fix:tx": "tsx scripts/fix-transaction-classification.ts",
     "kb:index": "tsx scripts/index-knowledge.ts",
