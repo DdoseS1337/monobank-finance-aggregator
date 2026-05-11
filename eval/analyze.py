@@ -22,9 +22,11 @@ import argparse
 import glob
 import math
 import os
+import sys
 from dataclasses import dataclass
 from typing import Optional
 
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -35,6 +37,75 @@ except ImportError:
     HAVE_SCIPY = False
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+
+# Minimum paired observations for a meaningful bootstrap CI. Below this we
+# fall back to a point estimate with a warning instead of pretending to
+# quantify uncertainty on a near-empty sample.
+MIN_PAIRED_N = 10
+
+
+# ─────────────────────── Effect size & bootstrap ───────────────
+
+
+def bootstrap_paired_diff_ci(
+    diffs,
+    n_boot: int = 1000,
+    ci: float = 0.95,
+    seed: int = 42,
+) -> tuple[float, float]:
+    """Paired-resampling bootstrap CI for the mean of `diffs`.
+
+    `diffs` is a 1-D iterable of per-pair differences (already paired upstream
+    by query_id). Each bootstrap iteration draws `len(diffs)` indices with
+    replacement from the empirical distribution and recomputes the mean.
+
+    Degenerate inputs:
+      - empty / n == 0   → (nan, nan)
+      - all-zero diffs   → (0.0, 0.0)  (no variability, CI collapses)
+    """
+    arr = np.asarray(list(diffs), dtype=float)
+    arr = arr[~np.isnan(arr)]
+    n = arr.size
+    if n == 0:
+        return (float("nan"), float("nan"))
+    if np.all(arr == arr[0]):
+        return (float(arr[0]), float(arr[0]))
+    rng = np.random.default_rng(seed)
+    idx = rng.integers(0, n, size=(n_boot, n))
+    boot_means = arr[idx].mean(axis=1)
+    alpha = (1.0 - ci) / 2.0
+    lower = float(np.quantile(boot_means, alpha))
+    upper = float(np.quantile(boot_means, 1.0 - alpha))
+    return (lower, upper)
+
+
+def cohens_d_paired(diffs) -> float:
+    """Paired Cohen's d = mean(diffs) / std(diffs, ddof=1).
+
+    Returns nan if n < 2 or std == 0 (no spread → effect size undefined).
+    """
+    arr = np.asarray(list(diffs), dtype=float)
+    arr = arr[~np.isnan(arr)]
+    if arr.size < 2:
+        return float("nan")
+    sd = float(arr.std(ddof=1))
+    if sd == 0.0:
+        return float("nan")
+    return float(arr.mean() / sd)
+
+
+def effect_interpretation(d: float) -> str:
+    """Cohen's conventional cutoffs on |d|."""
+    if math.isnan(d):
+        return "undefined"
+    ad = abs(d)
+    if ad < 0.2:
+        return "negligible"
+    if ad < 0.5:
+        return "small"
+    if ad < 0.8:
+        return "medium"
+    return "large"
 
 
 @dataclass
@@ -187,6 +258,77 @@ def paired_significance(pair: Pair) -> Optional[dict]:
     }
 
 
+def paired_diffs(pair: Pair, col_w: str, col_o: str, restrict=None):
+    """Return numpy array of per-pair (with − without) diffs.
+
+    `restrict` is an optional boolean mask applied to `pair.merged` *before*
+    extracting the columns. Use it to drop rows where the metric is
+    structurally meaningless (e.g. hallucination on non-numeric queries with
+    zero claims).
+    """
+    m = pair.merged
+    if restrict is not None:
+        m = m[restrict]
+    a = pd.to_numeric(m[col_w], errors="coerce")
+    b = pd.to_numeric(m[col_o], errors="coerce")
+    diffs = (a - b).dropna().to_numpy()
+    return diffs
+
+
+def render_effect_block(
+    title: str,
+    diffs,
+    *,
+    unit: str,
+    scale: float = 1.0,
+    precision: int = 2,
+    sign: str = "+",
+    seed: int = 42,
+) -> str:
+    """Format one ## section: mean Δ, bootstrap CI, Cohen's d, n.
+
+    `scale` multiplies values for display (e.g. 100 to render a fraction as %).
+    `unit` is appended literally to each number (e.g. '%', 'ms', '').
+    `sign` selects the sign convention shown in the headline: '+' shows always
+    with a sign, '−' likewise; pick whatever reads naturally for the metric.
+    """
+    arr = np.asarray(list(diffs), dtype=float)
+    arr = arr[~np.isnan(arr)]
+    n = int(arr.size)
+
+    def fmt(v: float) -> str:
+        if math.isnan(v):
+            return "nan"
+        return f"{v * scale:+.{precision}f}{unit}" if sign in {"+", "−"} else f"{v * scale:.{precision}f}{unit}"
+
+    lines = [f"## {title}\n"]
+    if n == 0:
+        lines.append("- No paired observations available — skipped.\n")
+        return "".join(lines)
+
+    mean = float(arr.mean())
+    lines.append(f"- Mean Δ = {fmt(mean)} (paired diff, with − without)\n")
+
+    if n < MIN_PAIRED_N:
+        lines.append(
+            f"- ⚠ Sample size too small for bootstrap CI (n={n}), reporting "
+            "point estimate only.\n"
+        )
+        lines.append(f"- n = {n} paired observations\n")
+        return "".join(lines)
+
+    lo, hi = bootstrap_paired_diff_ci(arr, n_boot=1000, ci=0.95, seed=seed)
+    d = cohens_d_paired(arr)
+    interp = effect_interpretation(d)
+    lines.append(f"- 95% CI (bootstrap, n_boot=1000): [{fmt(lo)}, {fmt(hi)}]\n")
+    if math.isnan(d):
+        lines.append("- Cohen's d (paired) = undefined (zero variance in diffs)\n")
+    else:
+        lines.append(f"- Cohen's d (paired) = {d:.2f} ({interp} effect)\n")
+    lines.append(f"- n = {n} paired observations\n")
+    return "".join(lines)
+
+
 def routing_table(pair: Pair) -> pd.DataFrame:
     m = pair.merged
     return pd.crosstab(m["type_w"], m["agent_w"]).reset_index()
@@ -331,6 +473,53 @@ def render_md(pair: Pair, with_path: str, without_path: str) -> str:
                 f"- Paired t-test: t = {sig['t_stat']:.3f}, p = {sig['t_pvalue']:.4g}\n"
                 f"- Wilcoxon signed-rank: W = {sig['wilcoxon_stat']:.3f}, p = {sig['wilcoxon_pvalue']:.4g}\n"
             )
+
+    # ── Effect size + bootstrap CIs (complements t-test/Wilcoxon above) ──
+    # Hallucination rate: restrict to rows with ≥1 verifiable claim so the
+    # diff is meaningful (queries with no claims have mechanically equal
+    # halluc=0 on both sides).
+    halluc_mask = (pair.merged["verifTotal_o"] > 0) | (pair.merged["verifTotal_w"] > 0)
+    halluc_diffs = paired_diffs(
+        pair, "hallucinationRate_w", "hallucinationRate_o", restrict=halluc_mask
+    )
+    parts.append("\n\n")
+    parts.append(
+        render_effect_block(
+            "Effect size and confidence intervals (hallucination rate)",
+            halluc_diffs,
+            unit="%",
+            scale=100.0,
+            precision=2,
+            sign="+",
+        )
+    )
+
+    lat_diffs = paired_diffs(pair, "latencyMs_w", "latencyMs_o")
+    parts.append("\n")
+    parts.append(
+        render_effect_block(
+            "Overhead: latency",
+            lat_diffs,
+            unit="ms",
+            scale=1.0,
+            precision=0,
+            sign="+",
+        )
+    )
+
+    cost_diffs = paired_diffs(pair, "costUsd_w", "costUsd_o")
+    parts.append("\n")
+    parts.append(
+        render_effect_block(
+            "Overhead: cost per query",
+            cost_diffs,
+            unit=" USD",
+            scale=1.0,
+            precision=6,
+            sign="+",
+        )
+    )
+
     parts.append("\n\n## Charts\n")
     parts.append("- `chart-halluc-by-type.png` — bar chart of hallucination rate per query type\n")
     parts.append("- `chart-latency-box.png` — latency distribution per mode\n")
@@ -387,7 +576,11 @@ def main() -> None:
 
     print(f"OK. Wrote {md_path}")
     print(f"Charts in {HERE}/")
-    print(f"\n--- preview ---\n{md[:1200]}…")
+    # Re-encode preview through the active console codec so Windows cp1251
+    # doesn't choke on Δ / — / … etc. The MD file itself is always UTF-8.
+    enc = (sys.stdout.encoding or "utf-8")
+    preview = (md[:1200] + "...").encode(enc, errors="replace").decode(enc)
+    print(f"\n--- preview ---\n{preview}")
 
 
 if __name__ == "__main__":

@@ -1,4 +1,6 @@
 import 'reflect-metadata';
+import * as fs from 'fs';
+import * as path from 'path';
 import { NestFactory } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
@@ -8,7 +10,7 @@ import { QueueModule } from '../shared-kernel/queues/queue.module';
 import { EventsModule } from '../shared-kernel/events/events.module';
 import { AiKernelModule } from '../shared-kernel/ai/ai-kernel.module';
 import { EvalModule } from './eval.module';
-import { ForecastEvaluator } from './forecast-evaluator';
+import { ForecastEvaluator, ForecastRollingReport } from './forecast-evaluator';
 import { ToolSuccessReport } from './tool-success-rate';
 import { RecommendationAcceptanceSimulator } from './recommendation-acceptance';
 
@@ -30,6 +32,9 @@ interface CliArgs {
   horizon?: number;
   trials?: number;
   daysBack?: number;
+  rolling?: number;
+  stepDays?: number;
+  seed?: number;
 }
 
 function parseArgs(argv: string[]): CliArgs {
@@ -51,6 +56,9 @@ function parseArgs(argv: string[]): CliArgs {
     if (key === 'horizon') out.horizon = Number(value);
     if (key === 'trials') out.trials = Number(value);
     if (key === 'days') out.daysBack = Number(value);
+    if (key === 'rolling') out.rolling = Number(value);
+    if (key === 'step') out.stepDays = Number(value);
+    if (key === 'seed') out.seed = Number(value);
   }
   return out;
 }
@@ -96,6 +104,12 @@ async function runForecast(eval_: ForecastEvaluator, args: CliArgs): Promise<voi
     console.log('▶ Forecast eval: skipped (no --user=<uuid> provided)');
     return;
   }
+
+  if (args.rolling && args.rolling > 1) {
+    await runForecastRolling(eval_, args);
+    return;
+  }
+
   console.log(`▶ Forecast eval (user=${args.userId}, horizon=${args.horizon ?? 30}d, trials=${args.trials ?? 1000})`);
   const report = await eval_.evaluate({
     userId: args.userId,
@@ -110,6 +124,123 @@ async function runForecast(eval_: ForecastEvaluator, args: CliArgs): Promise<voi
     'RMSE': report.metrics.rmse.toFixed(2),
     'Model': report.modelVersion,
   });
+}
+
+async function runForecastRolling(eval_: ForecastEvaluator, args: CliArgs): Promise<void> {
+  const windows = args.rolling!;
+  const horizon = args.horizon ?? 30;
+  const stepDays = args.stepDays ?? 7;
+  const trials = args.trials ?? 1000;
+  const seed = args.seed ?? 42;
+
+  console.log(
+    `▶ Forecast rolling-window backtest (user=${args.userId}, windows=${windows}, ` +
+      `step=${stepDays}d, horizon=${horizon}d, trials=${trials}, seed=${seed})`,
+  );
+
+  const report = await eval_.evaluateRollingWindow(args.userId!, {
+    windows,
+    stepDays,
+    horizon,
+    trials,
+    seed,
+  });
+
+  const ts = new Date().toISOString().replace(/[:.]/g, '-');
+  const outDir = path.resolve(process.cwd(), '..', 'eval');
+  fs.mkdirSync(outDir, { recursive: true });
+  const csvPath = path.join(outDir, `forecast-rolling-${ts}.csv`);
+  const mdPath = path.join(outDir, 'forecast-rolling-summary.md');
+
+  fs.writeFileSync(csvPath, renderRollingCsv(report), 'utf8');
+  fs.writeFileSync(mdPath, renderRollingMd(report), 'utf8');
+
+  console.table(
+    report.windows.map((w) => ({
+      i: w.windowIndex,
+      cutoff: w.cutoffDate,
+      'MAPE %': (w.metrics.mape * 100).toFixed(2),
+      'cov90 %': (w.metrics.coverage90 * 100).toFixed(1),
+      bias: w.metrics.bias.toFixed(2),
+      rmse: w.metrics.rmse.toFixed(2),
+      n: w.samples,
+    })),
+  );
+  console.log(
+    `Aggregate: MAPE = ${(report.aggregate.mapeMean * 100).toFixed(2)}% ± ` +
+      `${(report.aggregate.mapeStd * 100).toFixed(2)}% across ${report.aggregate.windowsUsed} windows`,
+  );
+  console.log(`CSV  → ${csvPath}`);
+  console.log(`MD   → ${mdPath}`);
+}
+
+function renderRollingCsv(report: ForecastRollingReport): string {
+  const header = 'window_index,cutoff_date,mape,coverage,bias,rmse,samples';
+  const rows = report.windows.map((w) =>
+    [
+      w.windowIndex,
+      w.cutoffDate,
+      w.metrics.mape.toFixed(6),
+      w.metrics.coverage90.toFixed(6),
+      w.metrics.bias.toFixed(6),
+      w.metrics.rmse.toFixed(6),
+      w.samples,
+    ].join(','),
+  );
+  return [header, ...rows].join('\n') + '\n';
+}
+
+function renderRollingMd(report: ForecastRollingReport): string {
+  const a = report.aggregate;
+  const pct = (x: number) => (x * 100).toFixed(2);
+  const interpretation =
+    a.mapeStd <= 0.05
+      ? 'Низьке std MAPE (≤5%) свідчить про стабільність моделі поза тренувальним вікном.'
+      : a.mapeStd <= 0.1
+        ? 'Помірне std MAPE (5–10%) — модель прийнятно стабільна, але чутлива до зсуву вікна.'
+        : 'Високе std MAPE (>10%) — прогноз сильно залежить від обраного cutoff; калібрування потребує уточнення.';
+
+  const lines: string[] = [];
+  lines.push('# Forecast — Rolling-Window Backtest');
+  lines.push('');
+  lines.push(
+    `User: \`${report.userId}\`  ·  Model: \`${report.modelVersion}\`  ·  Generated: ${new Date().toISOString()}`,
+  );
+  lines.push('');
+  lines.push('## Configuration');
+  lines.push('');
+  lines.push(`- baseCutoff: ${report.config.baseCutoff}`);
+  lines.push(`- windows: ${report.config.windows}`);
+  lines.push(`- stepDays: ${report.config.stepDays}`);
+  lines.push(`- horizon: ${report.config.horizon}`);
+  lines.push(`- trials: ${report.config.trials}`);
+  lines.push(`- seed: ${report.config.seed} (per-window seed = seed + i, deterministic)`);
+  lines.push('');
+  lines.push('## Per-window results');
+  lines.push('');
+  lines.push('| i | cutoff | MAPE % | coverage P10–P90 % | bias | RMSE | n |');
+  lines.push('|---|---|---|---|---|---|---|');
+  for (const w of report.windows) {
+    lines.push(
+      `| ${w.windowIndex} | ${w.cutoffDate} | ${pct(w.metrics.mape)} | ` +
+        `${pct(w.metrics.coverage90)} | ${w.metrics.bias.toFixed(2)} | ` +
+        `${w.metrics.rmse.toFixed(2)} | ${w.samples} |`,
+    );
+  }
+  lines.push('');
+  lines.push('## Aggregate');
+  lines.push('');
+  lines.push(`- **MAPE** = ${pct(a.mapeMean)}% ± ${pct(a.mapeStd)}% across ${a.windowsUsed} windows`);
+  lines.push(`- **Coverage P10–P90** = ${pct(a.coverage90Mean)}% ± ${pct(a.coverage90Std)}%`);
+  lines.push(`- **Bias** = ${a.biasMean.toFixed(2)} ± ${a.biasStd.toFixed(2)}`);
+  lines.push(`- **RMSE (mean)** = ${a.rmseMean.toFixed(2)}`);
+  lines.push(`- **Samples (total)** = ${a.samplesTotal}`);
+  lines.push('');
+  lines.push('## Interpretation');
+  lines.push('');
+  lines.push(interpretation);
+  lines.push('');
+  return lines.join('\n');
 }
 
 async function runToolReport(report: ToolSuccessReport, args: CliArgs) {

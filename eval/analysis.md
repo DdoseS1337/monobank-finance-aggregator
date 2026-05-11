@@ -70,6 +70,31 @@ Source CSVs:
 
 
 
+
+## Effect size and confidence intervals (hallucination rate)
+- Mean Δ = -11.38% (paired diff, with − without)
+- 95% CI (bootstrap, n_boot=1000): [-21.96%, -2.48%]
+- Cohen's d (paired) = -0.39 (small effect)
+- n = 35 paired observations
+
+
+
+## Overhead: latency
+- Mean Δ = +1922ms (paired diff, with − without)
+- 95% CI (bootstrap, n_boot=1000): [-2934ms, +7317ms]
+- Cohen's d (paired) = 0.10 (negligible effect)
+- n = 49 paired observations
+
+
+
+## Overhead: cost per query
+- Mean Δ = +0.000922 USD (paired diff, with − without)
+- 95% CI (bootstrap, n_boot=1000): [+0.000134 USD, +0.001808 USD]
+- Cohen's d (paired) = 0.29 (small effect)
+- n = 49 paired observations
+
+
+
 ## Charts
 
 - `chart-halluc-by-type.png` — bar chart of hallucination rate per query type

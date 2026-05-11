@@ -35,11 +35,18 @@ npm run eval -- forecast --user=<UUID> --horizon=30
 npm run eval -- tools --days=30
 npm run eval -- agents --days=30
 npm run eval -- recommendations --user=<UUID>
+
+# Rolling-window backtest (строгий режим для розділу 5 роботи)
+npm run eval -- forecast --user=<UUID> --rolling=12 --horizon=30 --step=7 --trials=1000 --seed=42
 ```
 
 ### 2.1 Forecast: ForecastEvaluator
 
-Алгоритм ([`forecast-evaluator.ts`](backend/src/eval/forecast-evaluator.ts)):
+У файлі [`forecast-evaluator.ts`](backend/src/eval/forecast-evaluator.ts) реалізовано два режими оцінки.
+
+#### 2.1.1 Single-shot (швидкий режим для локальної ітерації)
+
+Метод `evaluate()` — використовується під час розробки для миттєвого фідбеку.
 
 ```
 1. Фіксуємо cutoff = now − horizon
@@ -56,7 +63,44 @@ npm run eval -- recommendations --user=<UUID>
      RMSE     = sqrt((1/N) Σ (actual[d] − P50[d])²)
 ```
 
-**Caveat (важливо для розділу 5):** v1 evaluator обчислює метрики *оптимістично*, бо модель бачила тестовий період під час тренування історичної бази. Для строгої оцінки треба переписати на **rolling window backtest** (slide cutoff назад на тиждень × 12 → агрегувати MAPE). Це позначено `// Limitations:` коментарем у файлі та виноситься у "Майбутні доробки" роботи.
+Single-shot режим **не** використовується як основна метрика у розділі 5 — він призначений лише для перевірки, що pipeline працює, після змін у симуляторі або калібровках.
+
+#### 2.1.2 Rolling-window backtest (основна метрика розділу 5)
+
+Метод `evaluateRollingWindow(userId, options)` усуває oprtimistic bias single-shot режиму: замість одного фіксованого cutoff він ковзає cutoff назад по історії і агрегує метрики через `windows` незалежних оцінювань.
+
+```
+Параметри: baseCutoff (default = now), windows (=12), stepDays (=7),
+           horizon (=30), trials (=1000), seed (=42).
+
+Для кожного i ∈ [0..windows−1]:
+  cutoff_i           = baseCutoff − i*stepDays
+  balanceAtCutoff_i  = currentBalance − Σ(transactions transactionDate > cutoff_i)
+  projection_i       = ForecastPipeline.run(seed = seed + i, horizonDays = horizon)
+                       (P-band balances re-anchored: +offset = balanceAtCutoff_i − currentBalance)
+  actuals_i[d]       = balanceAtCutoff_i + cumulative net flow для d ∈ (cutoff_i, cutoff_i+horizon]
+                       (тільки дні d ≤ today)
+  metrics_i          = computeMetrics(observed_i)   // ті ж формули MAPE/coverage/bias/RMSE
+
+Агрегати по window-у:
+  MAPE_mean      = mean(metrics_i.mape)
+  MAPE_std       = std (metrics_i.mape)
+  coverage_mean  = mean(metrics_i.coverage90)
+  coverage_std   = std (metrics_i.coverage90)
+  bias_mean      = mean(metrics_i.bias)
+  bias_std       = std (metrics_i.bias)
+  RMSE_mean      = mean(metrics_i.rmse)
+```
+
+**Чому це строго:** кожне вікно порівнюється з історичним проміжком, який *повністю* лежить у минулому; balance-at-cutoff реконструюється з transaction-ledger-у, тому actuals не містять "майбутньої" інформації, до якої прогноз не мав доступу під час re-anchor-у. Залишковий leakage обмежено історичним baseline distribution, який обчислюється one-pass на повній історії — це винесено у "Обмеження" (§4).
+
+**Детермінізм:** per-window seed = `seed + i`, тому повторний запуск з тим же `--seed` дає ідентичні MAPE/coverage/bias/RMSE по кожному вікну і по агрегату.
+
+**Артефакти:**
+- `eval/forecast-rolling-<timestamp>.csv` — колонки: `window_index, cutoff_date, mape, coverage, bias, rmse, samples`.
+- `eval/forecast-rolling-summary.md` — per-window таблиця, агрегат `MAPE = X% ± Y% across N windows`, інтерпретація стабільності (≤5% std → стабільна, 5–10% → помірна, >10% → нестабільна).
+
+**Цитування у розділі 5:** наводити агрегат із `summary.md` (наприклад, *"MAPE = 18.4% ± 3.2% по 12 rolling-window-ах з кроком 7 днів, horizon = 30 днів"*) — це і є primary number роботи; single-shot значення в §2.1.1 наводити можна лише для контрасту.
 
 ### 2.2 Tool / Agent звіти: ToolSuccessReport
 
