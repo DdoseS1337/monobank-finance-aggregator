@@ -67,7 +67,9 @@ export class ForecastPipeline {
 
     const startingBalance = await this.aggregateStartingBalance(input.userId);
     const recurring = await this.recurring.detect(input.userId);
-    const baseline = await this.baseline.compute(input.userId);
+    // Pass recurring to baseline so it can subtract their expected daily
+    // contribution — otherwise the MC simulator double-counts them.
+    const baseline = await this.baseline.compute(input.userId, 90, recurring);
 
     const sim = this.simulator.simulate({
       startingBalance,

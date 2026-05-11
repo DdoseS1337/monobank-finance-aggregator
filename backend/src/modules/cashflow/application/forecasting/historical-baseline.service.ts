@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import dayjs from 'dayjs';
 import { PrismaService } from '../../../../shared-kernel/prisma/prisma.service';
+import { RecurringFlow } from './recurring-detector.service';
+
+const DAYS_PER_MONTH = 30.44;
 
 export interface DailyDistribution {
   /** mean discretionary outflow on day-of-week, after recurring is removed */
@@ -25,7 +28,11 @@ export interface DailyDistribution {
 export class HistoricalBaselineService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async compute(userId: string, windowDays = 90): Promise<DailyDistribution> {
+  async compute(
+    userId: string,
+    windowDays = 90,
+    recurring: RecurringFlow[] = [],
+  ): Promise<DailyDistribution> {
     const since = dayjs().subtract(windowDays, 'day').startOf('day').toDate();
     const rows = await this.prisma.transaction.findMany({
       where: {
@@ -59,24 +66,57 @@ export class HistoricalBaselineService {
       }
     }
 
+    // Build per-calendar-day arrays over the full window. Days with no
+    // matching transaction get an explicit 0 — otherwise mean/std collapse
+    // to "mean per transaction-day" which is a conditional expectation
+    // and overestimates the per-day cashflow when inflow/outflow days are
+    // sparse (e.g. salary lands on ~2 days/month → meanInflowDaily would
+    // be ~15× the true per-calendar-day mean).
     const dowSum = new Array(7).fill(0);
-    const dowCount = new Array(7).fill(0);
-    const allOutflows: number[] = [];
-    for (const [key, amount] of dailyOutflow) {
-      const dow = dayjs(key).day();
-      dowSum[dow] += amount;
-      dowCount[dow] += 1;
-      allOutflows.push(amount);
+    const dowDays = new Array(7).fill(0);
+    const outflowPerDay: number[] = new Array(windowDays).fill(0);
+    const inflowPerDay: number[] = new Array(windowDays).fill(0);
+    for (let i = 0; i < windowDays; i++) {
+      const day = dayjs(since).add(i, 'day');
+      const dayKey = day.format('YYYY-MM-DD');
+      const dow = day.day();
+      const out = dailyOutflow.get(dayKey) ?? 0;
+      const inn = dailyInflow.get(dayKey) ?? 0;
+      outflowPerDay[i] = out;
+      inflowPerDay[i] = inn;
+      dowSum[dow] += out;
+      dowDays[dow] += 1;
     }
-    const meanByDow = dowSum.map((sum, i) => (dowCount[i] > 0 ? sum / dowCount[i] : 0));
-
-    const inflowValues = [...dailyInflow.values()];
+    // Subtract recurring patterns' expected daily contribution. In this
+    // codebase `is_recurring` is rarely set on raw transactions, so without
+    // this step the recurring inflows/outflows would be counted twice:
+    // once in the baseline distribution and once as the deterministic
+    // schedule added by MonteCarloSimulator.scheduleRecurring.
+    const dailyInflowFromRecurring = recurring
+      .filter((f) => f.sign === 'INFLOW')
+      .reduce((s, f) => s + f.amountMonthly / DAYS_PER_MONTH, 0);
+    const dailyOutflowFromRecurring = recurring
+      .filter((f) => f.sign === 'OUTFLOW')
+      .reduce((s, f) => s + f.amountMonthly / DAYS_PER_MONTH, 0);
+    if (dailyInflowFromRecurring > 0 || dailyOutflowFromRecurring > 0) {
+      for (let i = 0; i < windowDays; i++) {
+        inflowPerDay[i] = Math.max(0, inflowPerDay[i] - dailyInflowFromRecurring);
+        outflowPerDay[i] = Math.max(0, outflowPerDay[i] - dailyOutflowFromRecurring);
+      }
+      // dowSum was computed before the subtraction, recompute from corrected outflows.
+      for (let i = 0; i < 7; i++) dowSum[i] = 0;
+      for (let i = 0; i < windowDays; i++) {
+        const dow = dayjs(since).add(i, 'day').day();
+        dowSum[dow] += outflowPerDay[i];
+      }
+    }
+    const meanByDow = dowSum.map((sum, i) => (dowDays[i] > 0 ? sum / dowDays[i] : 0));
 
     return {
       meanByDow,
-      stdDaily: this.stddev(allOutflows),
-      meanInflowDaily: this.mean(inflowValues),
-      stdInflowDaily: this.stddev(inflowValues),
+      stdDaily: this.stddev(outflowPerDay),
+      meanInflowDaily: this.mean(inflowPerDay),
+      stdInflowDaily: this.stddev(inflowPerDay),
       observations: rows.length,
     };
   }

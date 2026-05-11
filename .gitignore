@@ -57,6 +57,6 @@ skills-lock.json
 
 *.docx
 *.pptx
+*.pdf
 # Rendered mermaid diagrams (regenerate via 'npm --prefix backend run docs:render')
 docs/diagrams/rendered/
-

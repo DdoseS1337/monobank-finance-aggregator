@@ -14,6 +14,13 @@ export interface ForecastEvalConfig {
 
 export interface ForecastEvalMetrics {
   mape: number; // Mean Absolute Percentage Error of P50
+  /** Symmetric MAPE: 2·|a−p| / (|a|+|p|). Bounded [0, 2]; robust to near-zero
+   *  actual balances which inflate plain MAPE. Recommended for users whose
+   *  operating balance hovers around 0. */
+  smape: number;
+  /** mean(|a−p|) / mean(|a|) — scale-aware single number, immune to per-day
+   *  near-zero pathology of MAPE. */
+  maeRelative: number;
   coverage90: number; // % of actuals within [P10, P90]
   coverage50: number; // % of actuals within [P25, P75] (approximated by P10/P90 mid)
   bias: number; // mean signed error: actual − predicted
@@ -68,6 +75,10 @@ export interface ForecastRollingReport {
   aggregate: {
     mapeMean: number;
     mapeStd: number;
+    smapeMean: number;
+    smapeStd: number;
+    maeRelativeMean: number;
+    maeRelativeStd: number;
     coverage90Mean: number;
     coverage90Std: number;
     biasMean: number;
@@ -312,6 +323,10 @@ export class ForecastEvaluator {
       return {
         mapeMean: 0,
         mapeStd: 0,
+        smapeMean: 0,
+        smapeStd: 0,
+        maeRelativeMean: 0,
+        maeRelativeStd: 0,
         coverage90Mean: 0,
         coverage90Std: 0,
         biasMean: 0,
@@ -328,12 +343,18 @@ export class ForecastEvaluator {
       return { mean: m, std: Math.sqrt(variance) };
     };
     const mape = meanStd(usable.map((r) => r.metrics.mape));
+    const smape = meanStd(usable.map((r) => r.metrics.smape));
+    const maeRel = meanStd(usable.map((r) => r.metrics.maeRelative));
     const coverage = meanStd(usable.map((r) => r.metrics.coverage90));
     const bias = meanStd(usable.map((r) => r.metrics.bias));
     const rmse = meanStd(usable.map((r) => r.metrics.rmse));
     return {
       mapeMean: mape.mean,
       mapeStd: mape.std,
+      smapeMean: smape.mean,
+      smapeStd: smape.std,
+      maeRelativeMean: maeRel.mean,
+      maeRelativeStd: maeRel.std,
       coverage90Mean: coverage.mean,
       coverage90Std: coverage.std,
       biasMean: bias.mean,
@@ -412,18 +433,36 @@ export class ForecastEvaluator {
     rows: Array<{ actual: number; p10: number; p50: number; p90: number; inBand90: boolean }>,
   ): ForecastEvalMetrics {
     if (rows.length === 0) {
-      return { mape: 0, coverage90: 0, coverage50: 0, bias: 0, rmse: 0 };
+      return {
+        mape: 0,
+        smape: 0,
+        maeRelative: 0,
+        coverage90: 0,
+        coverage50: 0,
+        bias: 0,
+        rmse: 0,
+      };
     }
     let sumPctError = 0;
+    let sumSymPctError = 0;
+    let sumAbsError = 0;
+    let sumAbsActual = 0;
     let inBand90 = 0;
     let inBand50 = 0;
     let sumSignedError = 0;
     let sumSquared = 0;
     for (const r of rows) {
+      const absErr = Math.abs(r.actual - r.p50);
       const denom = Math.max(1, Math.abs(r.actual));
-      sumPctError += Math.abs(r.actual - r.p50) / denom;
+      sumPctError += absErr / denom;
+      // sMAPE — symmetric, bounded [0, 2]. Add EPSILON to avoid 0/0 when both
+      // actual and predicted are exactly 0.
+      const symDenom = (Math.abs(r.actual) + Math.abs(r.p50)) / 2;
+      sumSymPctError += symDenom > 0 ? absErr / symDenom : 0;
+      sumAbsError += absErr;
+      sumAbsActual += Math.abs(r.actual);
       sumSignedError += r.actual - r.p50;
-      sumSquared += (r.actual - r.p50) ** 2;
+      sumSquared += absErr ** 2;
       if (r.inBand90) inBand90++;
       const p25 = r.p10 + 0.4 * (r.p50 - r.p10);
       const p75 = r.p50 + 0.6 * (r.p90 - r.p50);
@@ -432,6 +471,8 @@ export class ForecastEvaluator {
     const n = rows.length;
     return {
       mape: sumPctError / n,
+      smape: sumSymPctError / n,
+      maeRelative: sumAbsActual > 0 ? sumAbsError / sumAbsActual : 0,
       coverage90: inBand90 / n,
       coverage50: inBand50 / n,
       bias: sumSignedError / n,

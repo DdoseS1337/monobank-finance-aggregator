@@ -161,28 +161,35 @@ async function runForecastRolling(eval_: ForecastEvaluator, args: CliArgs): Prom
     report.windows.map((w) => ({
       i: w.windowIndex,
       cutoff: w.cutoffDate,
-      'MAPE %': (w.metrics.mape * 100).toFixed(2),
+      'sMAPE %': (w.metrics.smape * 100).toFixed(1),
+      'MAE/|a| %': (w.metrics.maeRelative * 100).toFixed(1),
       'cov90 %': (w.metrics.coverage90 * 100).toFixed(1),
-      bias: w.metrics.bias.toFixed(2),
-      rmse: w.metrics.rmse.toFixed(2),
+      bias: w.metrics.bias.toFixed(0),
+      rmse: w.metrics.rmse.toFixed(0),
       n: w.samples,
     })),
   );
   console.log(
-    `Aggregate: MAPE = ${(report.aggregate.mapeMean * 100).toFixed(2)}% ± ` +
-      `${(report.aggregate.mapeStd * 100).toFixed(2)}% across ${report.aggregate.windowsUsed} windows`,
+    `Aggregate: sMAPE = ${(report.aggregate.smapeMean * 100).toFixed(2)}% ± ` +
+      `${(report.aggregate.smapeStd * 100).toFixed(2)}% · ` +
+      `MAE/|actual| = ${(report.aggregate.maeRelativeMean * 100).toFixed(2)}% · ` +
+      `coverage = ${(report.aggregate.coverage90Mean * 100).toFixed(1)}% across ` +
+      `${report.aggregate.windowsUsed} windows`,
   );
   console.log(`CSV  → ${csvPath}`);
   console.log(`MD   → ${mdPath}`);
 }
 
 function renderRollingCsv(report: ForecastRollingReport): string {
-  const header = 'window_index,cutoff_date,mape,coverage,bias,rmse,samples';
+  const header =
+    'window_index,cutoff_date,mape,smape,mae_relative,coverage,bias,rmse,samples';
   const rows = report.windows.map((w) =>
     [
       w.windowIndex,
       w.cutoffDate,
       w.metrics.mape.toFixed(6),
+      w.metrics.smape.toFixed(6),
+      w.metrics.maeRelative.toFixed(6),
       w.metrics.coverage90.toFixed(6),
       w.metrics.bias.toFixed(6),
       w.metrics.rmse.toFixed(6),
@@ -220,11 +227,14 @@ function renderRollingMd(report: ForecastRollingReport): string {
   lines.push('');
   lines.push('## Per-window results');
   lines.push('');
-  lines.push('| i | cutoff | MAPE % | coverage P10–P90 % | bias | RMSE | n |');
-  lines.push('|---|---|---|---|---|---|---|');
+  lines.push(
+    '| i | cutoff | MAPE % | sMAPE % | MAE/|actual| % | coverage P10–P90 % | bias | RMSE | n |',
+  );
+  lines.push('|---|---|---|---|---|---|---|---|---|');
   for (const w of report.windows) {
     lines.push(
       `| ${w.windowIndex} | ${w.cutoffDate} | ${pct(w.metrics.mape)} | ` +
+        `${pct(w.metrics.smape)} | ${pct(w.metrics.maeRelative)} | ` +
         `${pct(w.metrics.coverage90)} | ${w.metrics.bias.toFixed(2)} | ` +
         `${w.metrics.rmse.toFixed(2)} | ${w.samples} |`,
     );
@@ -233,6 +243,8 @@ function renderRollingMd(report: ForecastRollingReport): string {
   lines.push('## Aggregate');
   lines.push('');
   lines.push(`- **MAPE** = ${pct(a.mapeMean)}% ± ${pct(a.mapeStd)}% across ${a.windowsUsed} windows`);
+  lines.push(`- **sMAPE** = ${pct(a.smapeMean)}% ± ${pct(a.smapeStd)}% (symmetric, bounded 0–200%; robust to near-zero balances)`);
+  lines.push(`- **MAE / mean|actual|** = ${pct(a.maeRelativeMean)}% ± ${pct(a.maeRelativeStd)}% (scale-aware, immune to per-day near-zero pathology)`);
   lines.push(`- **Coverage P10–P90** = ${pct(a.coverage90Mean)}% ± ${pct(a.coverage90Std)}%`);
   lines.push(`- **Bias** = ${a.biasMean.toFixed(2)} ± ${a.biasStd.toFixed(2)}`);
   lines.push(`- **RMSE (mean)** = ${a.rmseMean.toFixed(2)}`);
