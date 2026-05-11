@@ -1,0 +1,491 @@
+{
+  "meta": {
+    "version": "1.0",
+    "n_questions": 20,
+    "language": "uk",
+    "db_source": "transactions.db",
+    "description": "Golden dataset для оцінки tool-use vs RAG vs text-to-SQL у системах фінансової аналітики з природномовним інтерфейсом.",
+    "difficulty_distribution": {
+      "easy": 5,
+      "medium": 7,
+      "hard": 6,
+      "trap": 2
+    }
+  },
+  "questions": [
+    {
+      "id": 1,
+      "question_uk": "Скільки я витратив на каву в березні 2026 року?",
+      "difficulty": "easy",
+      "query_type": "single_aggregation",
+      "reference_sql": "\n            SELECT ROUND(SUM(-amount), 2) AS total\n            FROM transactions\n            WHERE category='coffee' AND amount<0\n              AND transaction_date BETWEEN '2026-03-01' AND '2026-03-31'\n        ",
+      "evaluation": "exact_numeric",
+      "tolerance_pct": 1.0,
+      "notes": {
+        "tool_use": "easy — функція get_spending(category, period)",
+        "text_to_sql": "easy — стандартна SUM + WHERE",
+        "rag": "fail — потребує точної агрегації; LLM спробує підсумувати top-k результатів і помилиться"
+      },
+      "expected": {
+        "value": 1921.23,
+        "type": "numeric"
+      }
+    },
+    {
+      "id": 2,
+      "question_uk": "Скільки разів я робив покупки в АТБ за весь період?",
+      "difficulty": "easy",
+      "query_type": "single_count",
+      "reference_sql": "\n            SELECT COUNT(*) AS n\n            FROM transactions\n            WHERE merchant='АТБ' AND amount<0\n        ",
+      "evaluation": "exact_numeric",
+      "tolerance_pct": 0,
+      "notes": {
+        "tool_use": "easy — count_transactions(merchant)",
+        "text_to_sql": "easy — COUNT(*) WHERE",
+        "rag": "fail — RAG поверне приклади, але точний COUNT над усіма даними дати не зможе"
+      },
+      "expected": {
+        "value": 4,
+        "type": "numeric"
+      }
+    },
+    {
+      "id": 3,
+      "question_uk": "Яка моя загальна сума витрат за квітень 2026?",
+      "difficulty": "easy",
+      "query_type": "single_aggregation",
+      "reference_sql": "\n            SELECT ROUND(SUM(-amount), 2) AS total\n            FROM transactions\n            WHERE amount<0\n              AND transaction_date BETWEEN '2026-04-01' AND '2026-04-30'\n        ",
+      "evaluation": "exact_numeric",
+      "tolerance_pct": 1.0,
+      "notes": {
+        "tool_use": "easy",
+        "text_to_sql": "easy",
+        "rag": "fail — повна агрегація неможлива через top-k обмеження"
+      },
+      "expected": {
+        "value": 35659.78,
+        "type": "numeric"
+      }
+    },
+    {
+      "id": 4,
+      "question_uk": "Скільки я отримав зарплати за весь період?",
+      "difficulty": "easy",
+      "query_type": "single_aggregation_income",
+      "reference_sql": "\n            SELECT ROUND(SUM(amount), 2) AS total\n            FROM transactions\n            WHERE category='salary' AND amount>0\n        ",
+      "evaluation": "exact_numeric",
+      "tolerance_pct": 0,
+      "notes": {
+        "tool_use": "easy",
+        "text_to_sql": "easy",
+        "rag": "медіум — лише 8 транзакцій зарплати, всі можуть потрапити в top-k"
+      },
+      "expected": {
+        "value": 260000.0,
+        "type": "numeric"
+      }
+    },
+    {
+      "id": 5,
+      "question_uk": "Скільки разів я платив за Netflix?",
+      "difficulty": "easy",
+      "query_type": "single_count",
+      "reference_sql": "\n            SELECT COUNT(*) AS n\n            FROM transactions\n            WHERE merchant='Netflix'\n        ",
+      "evaluation": "exact_numeric",
+      "tolerance_pct": 0,
+      "notes": {
+        "tool_use": "easy",
+        "text_to_sql": "easy",
+        "rag": "easy — лише 4 транзакції, всі знайдуться семантично"
+      },
+      "expected": {
+        "value": 4,
+        "type": "numeric"
+      }
+    },
+    {
+      "id": 6,
+      "question_uk": "Назви мої 5 найбільших витрат за весь період і вкажи на що вони були.",
+      "difficulty": "medium",
+      "query_type": "top_n_with_context",
+      "reference_sql": "\n            SELECT transaction_date, merchant, -amount AS amt, description\n            FROM transactions\n            WHERE amount<0\n            ORDER BY amount ASC LIMIT 5\n        ",
+      "evaluation": "ranked_set_with_amounts",
+      "tolerance_pct": 1.0,
+      "notes": {
+        "tool_use": "easy — get_top_expenses(n=5)",
+        "text_to_sql": "easy — ORDER BY ASC LIMIT 5",
+        "rag": "medium — викиди мають великі суми в описах, semantic match може спрацювати"
+      },
+      "expected": {
+        "items": [
+          {
+            "rank": 1,
+            "date": "2026-03-08",
+            "merchant": "Rozetka",
+            "amount": 18900.0,
+            "description": "Покупка ноутбука MacBook Air M3 для роботи"
+          },
+          {
+            "rank": 2,
+            "date": "2026-01-25",
+            "merchant": "Foxtrot",
+            "amount": 8200.0,
+            "description": "Заміна холодильника на новий Samsung"
+          },
+          {
+            "rank": 3,
+            "date": "2026-04-22",
+            "merchant": "Medicover",
+            "amount": 4800.0,
+            "description": "Комплексний медогляд щорічний"
+          },
+          {
+            "rank": 4,
+            "date": "2026-02-14",
+            "merchant": "Concert.ua",
+            "amount": 4500.0,
+            "description": "Квитки на концерт Океан Ельзи у Палаці Україна"
+          },
+          {
+            "rank": 5,
+            "date": "2026-01-10",
+            "merchant": "Foxtrot",
+            "amount": 3487.51,
+            "description": "Покупка техніки в Foxtrot"
+          }
+        ],
+        "type": "ranked_list"
+      }
+    },
+    {
+      "id": 7,
+      "question_uk": "На яку категорію витрат я витрачаю найбільше грошей?",
+      "difficulty": "medium",
+      "query_type": "group_by_max",
+      "reference_sql": "\n            SELECT category, ROUND(SUM(-amount), 2) AS total\n            FROM transactions\n            WHERE amount<0\n            GROUP BY category\n            ORDER BY total DESC LIMIT 1\n        ",
+      "evaluation": "category_match",
+      "notes": {
+        "tool_use": "easy — get_spending_by_category()",
+        "text_to_sql": "easy — GROUP BY ORDER BY LIMIT 1",
+        "rag": "fail — потребує агрегації по всіх категоріях"
+      },
+      "expected": {
+        "category": "shopping",
+        "total": 35534.58,
+        "type": "category"
+      }
+    },
+    {
+      "id": 8,
+      "question_uk": "В якому місяці я витратив найбільше на ресторани?",
+      "difficulty": "medium",
+      "query_type": "group_by_time_max",
+      "reference_sql": "\n            SELECT strftime('%Y-%m', transaction_date) AS month,\n                   ROUND(SUM(-amount), 2) AS total\n            FROM transactions\n            WHERE category='restaurants' AND amount<0\n            GROUP BY month\n            ORDER BY total DESC LIMIT 1\n        ",
+      "evaluation": "month_match",
+      "notes": {
+        "tool_use": "easy — get_monthly_breakdown(category)",
+        "text_to_sql": "medium — strftime, GROUP BY month",
+        "rag": "fail — потребує time-based aggregation"
+      },
+      "expected": {
+        "month": "2026-02",
+        "total": 6646.39,
+        "type": "month"
+      }
+    },
+    {
+      "id": 9,
+      "question_uk": "Який мій середній чек у ресторанах?",
+      "difficulty": "medium",
+      "query_type": "single_avg",
+      "reference_sql": "\n            SELECT ROUND(AVG(-amount), 2) AS avg_check\n            FROM transactions\n            WHERE category='restaurants' AND amount<0\n        ",
+      "evaluation": "exact_numeric",
+      "tolerance_pct": 1.0,
+      "notes": {
+        "tool_use": "easy",
+        "text_to_sql": "easy",
+        "rag": "fail — AVG неможливо без повних даних"
+      },
+      "expected": {
+        "value": 663.06,
+        "type": "numeric"
+      }
+    },
+    {
+      "id": 10,
+      "question_uk": "Я витратив більше на продукти в січні чи в лютому?",
+      "difficulty": "medium",
+      "query_type": "period_comparison",
+      "reference_sql": "\n            SELECT\n                ROUND(SUM(CASE WHEN strftime('%Y-%m', transaction_date)='2026-01' THEN -amount ELSE 0 END), 2) AS jan,\n                ROUND(SUM(CASE WHEN strftime('%Y-%m', transaction_date)='2026-02' THEN -amount ELSE 0 END), 2) AS feb\n            FROM transactions\n            WHERE category='groceries' AND amount<0\n        ",
+      "evaluation": "comparison_with_values",
+      "notes": {
+        "tool_use": "easy — два виклики get_spending() + порівняння",
+        "text_to_sql": "medium — CASE або два запити",
+        "rag": "fail — порівняння двох періодів"
+      },
+      "expected": {
+        "jan": 9910.81,
+        "feb": 6579.4,
+        "winner": "jan",
+        "diff": 3331.41,
+        "type": "comparison"
+      }
+    },
+    {
+      "id": 11,
+      "question_uk": "Скільки я витратив на комунальні послуги взимку (січень + лютий 2026)?",
+      "difficulty": "medium",
+      "query_type": "multi_period_aggregation",
+      "reference_sql": "\n            SELECT ROUND(SUM(-amount), 2) AS total\n            FROM transactions\n            WHERE category='utilities' AND amount<0\n              AND transaction_date BETWEEN '2026-01-01' AND '2026-02-28'\n        ",
+      "evaluation": "exact_numeric",
+      "tolerance_pct": 1.0,
+      "notes": {
+        "tool_use": "easy",
+        "text_to_sql": "easy",
+        "rag": "fail — потрібна повна агрегація"
+      },
+      "expected": {
+        "value": 10443.92,
+        "type": "numeric"
+      }
+    },
+    {
+      "id": 12,
+      "question_uk": "Які мої найдорожчі покупки в категорії shopping (топ-3)?",
+      "difficulty": "medium",
+      "query_type": "filtered_top_n",
+      "reference_sql": "\n            SELECT transaction_date, merchant, -amount AS amt, description\n            FROM transactions\n            WHERE category='shopping' AND amount<0\n            ORDER BY amount ASC LIMIT 3\n        ",
+      "evaluation": "ranked_set_with_amounts",
+      "tolerance_pct": 1.0,
+      "notes": {
+        "tool_use": "easy",
+        "text_to_sql": "easy",
+        "rag": "medium — викиди можуть знайтись семантично"
+      },
+      "expected": {
+        "items": [
+          {
+            "rank": 1,
+            "date": "2026-03-08",
+            "merchant": "Rozetka",
+            "amount": 18900.0,
+            "description": "Покупка ноутбука MacBook Air M3 для роботи"
+          },
+          {
+            "rank": 2,
+            "date": "2026-01-25",
+            "merchant": "Foxtrot",
+            "amount": 8200.0,
+            "description": "Заміна холодильника на новий Samsung"
+          },
+          {
+            "rank": 3,
+            "date": "2026-01-10",
+            "merchant": "Foxtrot",
+            "amount": 3487.51,
+            "description": "Покупка техніки в Foxtrot"
+          }
+        ],
+        "type": "ranked_list"
+      }
+    },
+    {
+      "id": 13,
+      "question_uk": "Які підписки я плачу регулярно щомісяця?",
+      "difficulty": "hard",
+      "query_type": "recurring_detection",
+      "reference_sql": "\n            SELECT merchant, COUNT(*) AS n, ROUND(AVG(-amount), 2) AS avg_amt\n            FROM transactions\n            WHERE amount<0 AND is_recurring=1 AND category='subscriptions'\n            GROUP BY merchant\n            ORDER BY merchant\n        ",
+      "evaluation": "merchant_set",
+      "notes": {
+        "tool_use": "medium — потребує функції detect_recurring() або готового pattern matcher",
+        "text_to_sql": "medium-hard — GROUP BY HAVING COUNT >= 3, або фільтр по is_recurring (якщо модель здогадається використати флаг)",
+        "rag": "fail — pattern detection поза можливостями RAG"
+      },
+      "expected": {
+        "merchants": [
+          "Apple iCloud",
+          "Megogo",
+          "Netflix",
+          "Notion Labs",
+          "Spotify"
+        ],
+        "count": 5,
+        "details": [
+          {
+            "merchant": "Apple iCloud",
+            "n": 4,
+            "avg_amt": 99.5
+          },
+          {
+            "merchant": "Megogo",
+            "n": 4,
+            "avg_amt": 99.2
+          },
+          {
+            "merchant": "Netflix",
+            "n": 4,
+            "avg_amt": 298.82
+          },
+          {
+            "merchant": "Notion Labs",
+            "n": 4,
+            "avg_amt": 393.26
+          },
+          {
+            "merchant": "Spotify",
+            "n": 4,
+            "avg_amt": 133.4
+          }
+        ],
+        "type": "merchant_set"
+      }
+    },
+    {
+      "id": 14,
+      "question_uk": "Скільки днів у квітні я взагалі нічого не витрачав?",
+      "difficulty": "hard",
+      "query_type": "missing_days",
+      "reference_sql": "\n            WITH RECURSIVE april_days(d) AS (\n                SELECT '2026-04-01'\n                UNION ALL\n                SELECT date(d, '+1 day') FROM april_days WHERE d < '2026-04-30'\n            )\n            SELECT COUNT(*) AS no_spend_days\n            FROM april_days\n            WHERE d NOT IN (\n                SELECT DISTINCT transaction_date FROM transactions\n                WHERE amount<0 AND transaction_date BETWEEN '2026-04-01' AND '2026-04-30'\n            )\n        ",
+      "evaluation": "exact_numeric",
+      "tolerance_pct": 0,
+      "notes": {
+        "tool_use": "medium — потребує функції з date arithmetic",
+        "text_to_sql": "hard — recursive CTE або складна логіка",
+        "rag": "fail — питання про відсутні дані принципово недосяжне для RAG"
+      },
+      "expected": {
+        "value": 2,
+        "type": "numeric"
+      }
+    },
+    {
+      "id": 15,
+      "question_uk": "Який середній чек у кав'ярнях vs у ресторанах? Де я витрачаю більше за один раз?",
+      "difficulty": "hard",
+      "query_type": "multi_aggregation_comparison",
+      "reference_sql": "\n            SELECT\n                ROUND(AVG(CASE WHEN category='coffee' THEN -amount END), 2) AS coffee_avg,\n                ROUND(AVG(CASE WHEN category='restaurants' THEN -amount END), 2) AS rest_avg\n            FROM transactions\n            WHERE amount<0 AND category IN ('coffee', 'restaurants')\n        ",
+      "evaluation": "comparison_with_values",
+      "notes": {
+        "tool_use": "medium",
+        "text_to_sql": "medium — CASE WHEN AVG, або UNION/два запити",
+        "rag": "fail"
+      },
+      "expected": {
+        "coffee_avg": 132.07,
+        "rest_avg": 663.06,
+        "winner": "rest_avg",
+        "diff": 530.99,
+        "type": "comparison"
+      }
+    },
+    {
+      "id": 16,
+      "question_uk": "Яке співвідношення моїх обов'язкових витрат (продукти, комуналка, транспорт, здоров'я) до дискреційних (ресторани, кав'ярні, розваги, шопінг)?",
+      "difficulty": "hard",
+      "query_type": "ratio_across_categories",
+      "reference_sql": "\n            SELECT\n                ROUND(SUM(CASE WHEN category IN ('groceries','utilities','transport','health')\n                               THEN -amount ELSE 0 END), 2) AS essential,\n                ROUND(SUM(CASE WHEN category IN ('restaurants','coffee','entertainment','shopping')\n                               THEN -amount ELSE 0 END), 2) AS discretionary\n            FROM transactions\n            WHERE amount<0\n        ",
+      "evaluation": "ratio_with_values",
+      "notes": {
+        "tool_use": "medium — потребує композиції викликів",
+        "text_to_sql": "medium-hard — потребує розуміння категорій",
+        "rag": "fail — складна аналітика по великих категоріальних групах"
+      },
+      "expected": {
+        "essential": 74978.09,
+        "discretionary": 78977.86,
+        "ratio_essential_to_discretionary": 0.949,
+        "essential_share_pct": 48.7,
+        "type": "ratio"
+      }
+    },
+    {
+      "id": 17,
+      "question_uk": "Скільки я витратив на каву у вихідні дні (субота, неділя)?",
+      "difficulty": "hard",
+      "query_type": "weekday_filter_aggregation",
+      "reference_sql": "\n            SELECT ROUND(SUM(-amount), 2) AS total, COUNT(*) AS n\n            FROM transactions\n            WHERE category='coffee' AND amount<0\n              AND CAST(strftime('%w', transaction_date) AS INTEGER) IN (0, 6)\n        ",
+      "evaluation": "exact_numeric",
+      "tolerance_pct": 1.0,
+      "notes": {
+        "tool_use": "medium — потребує date filter у функції",
+        "text_to_sql": "hard — strftime('%w'), пам'ятати що 0=неділя в SQLite",
+        "rag": "fail — date arithmetic не для RAG"
+      },
+      "expected": {
+        "value": 2360.28,
+        "type": "numeric"
+      }
+    },
+    {
+      "id": 18,
+      "question_uk": "На скільки відсотків мої витрати на ресторани змінилися між січнем і квітнем?",
+      "difficulty": "hard",
+      "query_type": "trend_percentage_change",
+      "reference_sql": "\n            WITH monthly AS (\n                SELECT\n                    SUM(CASE WHEN strftime('%Y-%m', transaction_date)='2026-01' THEN -amount ELSE 0 END) AS jan,\n                    SUM(CASE WHEN strftime('%Y-%m', transaction_date)='2026-04' THEN -amount ELSE 0 END) AS apr\n                FROM transactions WHERE category='restaurants' AND amount<0\n            )\n            SELECT ROUND(jan, 2) AS jan, ROUND(apr, 2) AS apr,\n                   ROUND((apr - jan) * 100.0 / jan, 2) AS pct_change\n            FROM monthly\n        ",
+      "evaluation": "percentage_with_direction",
+      "tolerance_pct": 2.0,
+      "notes": {
+        "tool_use": "medium",
+        "text_to_sql": "hard — CTE, відсоткова зміна",
+        "rag": "fail"
+      },
+      "expected": {
+        "jan": 4548.22,
+        "apr": 5101.96,
+        "pct_change": 12.17,
+        "direction": "increase",
+        "type": "pct_change"
+      }
+    },
+    {
+      "id": 19,
+      "question_uk": "Скільки я витратив на алкоголь за останній місяць?",
+      "difficulty": "trap",
+      "query_type": "no_data_category",
+      "reference_sql": "\n            SELECT COUNT(*) AS n FROM transactions\n            WHERE category='alcohol' OR description LIKE '%алкоголь%'\n              OR description LIKE '%вино%' OR description LIKE '%горілка%'\n              OR description LIKE '%пиво%'\n        ",
+      "evaluation": "expect_zero_or_disclaimer",
+      "expected_behavior": "Система має відповісти, що такої категорії немає в даних, або повернути 0 без вигадування числа",
+      "notes": {
+        "tool_use": "проходить — функція не знайде, поверне порожній результат",
+        "text_to_sql": "проходить — SUM повертає NULL/0",
+        "rag": "ризик — може 'знайти' семантично схожі транзакції (ресторани, бари) і дати неправильну суму"
+      },
+      "expected": {
+        "value": 0,
+        "valid_responses": [
+          "0",
+          "не знайдено",
+          "немає таких транзакцій",
+          "немає даних",
+          "no data"
+        ],
+        "type": "trap_no_data"
+      }
+    },
+    {
+      "id": 20,
+      "question_uk": "Скільки я витратив на бензин за весь період?",
+      "difficulty": "trap",
+      "query_type": "no_data_category",
+      "reference_sql": "\n            SELECT COUNT(*) AS n FROM transactions\n            WHERE description LIKE '%бензин%' OR description LIKE '%пальне%'\n              OR description LIKE '%заправка%' OR merchant LIKE '%OKKO%'\n              OR merchant LIKE '%WOG%' OR merchant LIKE '%Shell%'\n        ",
+      "evaluation": "expect_zero_or_disclaimer",
+      "expected_behavior": "Немає АЗС у даних → відповідь '0' або 'немає таких транзакцій'. RAG може помилково запропонувати транспорт (Uklon, Uber).",
+      "notes": {
+        "tool_use": "проходить",
+        "text_to_sql": "проходить",
+        "rag": "висока ймовірність галюцинації — семантично 'транспорт' близько до 'бензину'"
+      },
+      "expected": {
+        "value": 0,
+        "valid_responses": [
+          "0",
+          "не знайдено",
+          "немає таких транзакцій",
+          "немає даних",
+          "no data"
+        ],
+        "type": "trap_no_data"
+      }
+    }
+  ]
+}

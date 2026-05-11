@@ -1,41 +1,59 @@
 import {
-  Controller,
-  Post,
-  Get,
-  Delete,
   Body,
+  Controller,
+  Delete,
+  Get,
   Param,
+  ParseUUIDPipe,
+  Post,
   UseGuards,
 } from '@nestjs/common';
-import { SupabaseGuard } from '../../../auth/supabase.guard';
-import { CurrentUser, AuthUser } from '../../../auth/current-user.decorator';
-import { AccountService } from '../application/account.service';
-import { LinkAccountDto } from './dto/link-account.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { IsString, Length } from 'class-validator';
+import { SupabaseAuthGuard } from '../../../auth/supabase.guard';
+import {
+  AuthenticatedUser,
+  CurrentUser,
+} from '../../../auth/current-user.decorator';
+import { AccountsService } from '../application/accounts.service';
 
+class LinkMonobankDto {
+  @IsString()
+  @Length(10, 256)
+  token!: string;
+}
+
+@ApiTags('accounts')
+@ApiBearerAuth()
+@UseGuards(SupabaseAuthGuard)
 @Controller('accounts')
-@UseGuards(SupabaseGuard)
 export class AccountsController {
-  constructor(private readonly accountService: AccountService) {}
+  constructor(private readonly service: AccountsService) {}
 
-  @Post('link')
-  async linkAccount(
-    @CurrentUser() user: AuthUser,
-    @Body() dto: LinkAccountDto,
+  @Post('monobank/link')
+  async linkMonobank(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: LinkMonobankDto,
   ) {
-    return this.accountService.linkAccount(user.id, dto);
+    return this.service.linkMonobankAccounts(user.id, dto.token);
   }
 
   @Get()
-  async listAccounts(@CurrentUser() user: AuthUser) {
-    return this.accountService.listAccounts(user.id);
+  async list(@CurrentUser() user: AuthenticatedUser) {
+    const rows = await this.service.listAccounts(user.id);
+    return rows.map((r) => ({
+      ...r,
+      balance: (r.balance as unknown as { toFixed: (n: number) => string }).toFixed(2),
+      linkedAt: r.linkedAt.toISOString(),
+    }));
   }
 
   @Delete(':id')
-  async unlinkAccount(
-    @CurrentUser() user: AuthUser,
-    @Param('id') id: string,
+  async unlink(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id', new ParseUUIDPipe()) id: string,
   ) {
-    await this.accountService.unlinkAccount(user.id, id);
-    return { success: true };
+    await this.service.unlinkAccount(user.id, id);
+    return { ok: true };
   }
 }

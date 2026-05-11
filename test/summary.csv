@@ -1,0 +1,4 @@
+system,accuracy_pct,f1_mean,latency_p50_s,latency_p95_s,cost_per_100_usd,total_cost_usd,n_calls
+tool_use,95.0,0.85,4.66,11.39,0.048,0.0191,40
+text_to_sql,70.0,0.522,3.86,7.46,0.021,0.0085,40
+rag,40.0,0.305,5.06,21.91,0.05,0.0199,40

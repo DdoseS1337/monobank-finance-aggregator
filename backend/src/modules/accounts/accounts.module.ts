@@ -1,13 +1,12 @@
-import { Module } from '@nestjs/common';
-import { BankProvidersModule } from '../bank-providers/bank-providers.module';
-import { AccountRepository } from './infrastructure/account.repository';
-import { AccountService } from './application/account.service';
+import { forwardRef, Module } from '@nestjs/common';
 import { AccountsController } from './presentation/accounts.controller';
+import { AccountsService } from './application/accounts.service';
+import { TransactionsModule } from '../transactions/transactions.module';
 
 @Module({
-  imports: [BankProvidersModule],
+  imports: [forwardRef(() => TransactionsModule)],
   controllers: [AccountsController],
-  providers: [AccountRepository, AccountService],
-  exports: [AccountRepository],
+  providers: [AccountsService],
+  exports: [AccountsService],
 })
 export class AccountsModule {}

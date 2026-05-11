@@ -1,13 +1,14 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { AuthenticatedRequest } from './supabase.guard';
 
-export interface AuthUser {
+export interface AuthenticatedUser {
   id: string;
   email: string;
 }
 
 export const CurrentUser = createParamDecorator(
-  (_: unknown, ctx: ExecutionContext): AuthUser => {
-    const request = ctx.switchToHttp().getRequest();
-    return request.user as AuthUser;
+  (_data: unknown, context: ExecutionContext): AuthenticatedUser => {
+    const req = context.switchToHttp().getRequest<AuthenticatedRequest>();
+    return req.user;
   },
 );

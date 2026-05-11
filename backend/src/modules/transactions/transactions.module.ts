@@ -1,24 +1,30 @@
 import { Module } from '@nestjs/common';
-import { BankProvidersModule } from '../bank-providers/bank-providers.module';
-import { MccModule } from '../mcc/mcc.module';
-import { MerchantRulesModule } from '../merchant-rules/merchant-rules.module';
-import { TransactionIngestionService } from './application/transaction-ingestion.service';
-import { TransactionQueryService } from './application/transaction-query.service';
-import { CsvImportService } from './application/csv-import.service';
-import { ManualTransactionService } from './application/manual-transaction.service';
-import { TransactionRepository } from './infrastructure/repositories/transaction.repository';
 import { TransactionsController } from './presentation/transactions.controller';
+import { MonobankWebhookController } from './presentation/webhooks/monobank-webhook.controller';
+import { TransactionsService } from './application/transactions.service';
+import { MonobankImportService } from './application/monobank-import.service';
+import { SpendingDecompositionService } from './application/spending-decomposition.service';
+import { MonobankClient } from './infrastructure/monobank.client';
+import { PrismaTransactionRepository } from './infrastructure/transaction.repository';
+import { TRANSACTION_REPOSITORY } from './domain/repositories.interface';
+import { CategorizationModule } from '../categorization/categorization.module';
 
 @Module({
-  imports: [BankProvidersModule, MccModule, MerchantRulesModule],
-  controllers: [TransactionsController],
+  imports: [CategorizationModule],
+  controllers: [TransactionsController, MonobankWebhookController],
   providers: [
-    TransactionIngestionService,
-    TransactionQueryService,
-    CsvImportService,
-    ManualTransactionService,
-    TransactionRepository,
+    TransactionsService,
+    MonobankImportService,
+    SpendingDecompositionService,
+    MonobankClient,
+    { provide: TRANSACTION_REPOSITORY, useClass: PrismaTransactionRepository },
   ],
-  exports: [TransactionIngestionService, TransactionRepository],
+  exports: [
+    TransactionsService,
+    MonobankImportService,
+    SpendingDecompositionService,
+    MonobankClient,
+    TRANSACTION_REPOSITORY,
+  ],
 })
 export class TransactionsModule {}
