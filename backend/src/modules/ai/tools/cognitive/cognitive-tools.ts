@@ -240,13 +240,20 @@ export class LookupEducationTool
 // ────────────────────────── Calculator ──────────────────────────
 
 const CalculateInput = z.object({
-  expression: z.string().min(1).max(200),
+  // Long enough to sum a month of transactions inline. Hard cap stays well
+  // below what JS can parse, but big enough that an agent rarely needs to
+  // chunk the calculation by hand.
+  expression: z.string().min(1).max(2000),
   /** Optional, for the agent to label the result (e.g. "monthly food budget"). */
   label: z.string().max(80).optional(),
 });
 type CalculateInput = z.infer<typeof CalculateInput>;
 
-const SAFE_EXPR = /^[\d\s+\-*/().,]+$/;
+const SAFE_EXPR = /^[\d\s+\-*/().]+$/;
+
+// Currency markers LLMs frequently paste in; stripped before arithmetic check.
+// Order matters: longer alphabetic markers before shorter / symbol ones.
+const CURRENCY_TOKEN = /(UAH|USD|EUR|GBP|PLN|грн|укр|₴|\$|€|£|¥)/gi;
 
 @Injectable()
 export class CalculateTool implements ToolDefinition<CalculateInput, unknown> {
@@ -263,9 +270,15 @@ export class CalculateTool implements ToolDefinition<CalculateInput, unknown> {
     // Normalise comma decimals (UA/EU style) to dots, drop space thousands.
     const normalised = input.expression
       .replace(/[\s  ]/g, '')
-      .replace(/(\d),(\d)/g, '$1.$2');
+      .replace(CURRENCY_TOKEN, '')
+      .replace(/(\d)_(?=\d)/g, '$1')
+      .replace(/(\d),(\d{3})(?!\d)/g, '$1$2')
+      .replace(/(\d),(\d{1,2})(?!\d)/g, '$1.$2');
 
     if (!SAFE_EXPR.test(normalised)) {
+      const offenders = Array.from(
+        new Set(normalised.replace(/[\d+\-*/().]/g, '')),
+      ).join('');
       return {
         ok: false,
         retryable: false,
@@ -273,7 +286,9 @@ export class CalculateTool implements ToolDefinition<CalculateInput, unknown> {
           kind: 'VALIDATION',
           field: 'expression',
           message:
-            'Expression contains characters outside the allowed set (digits, +, -, *, /, parentheses, dot).',
+            `Expression contains disallowed characters: "${offenders}". ` +
+            'Allowed: digits, + - * / ( ) and dot for decimals. ' +
+            'Strip currency names, units, variable names — pass only the arithmetic.',
         },
       };
     }
@@ -362,7 +377,7 @@ export class ExplainSpendingChangeTool
   readonly name = 'explain_spending_change';
   readonly category = 'COGNITIVE' as const;
   readonly description =
-    'Causal decomposition of spending change between two periods. Returns the absolute and percentage delta plus the breakdown by PRICE effect (same merchants, different avg ticket), VOLUME effect (same merchants, different transaction count), MIX effect (new vs dropped merchants/categories) and the cross term. Pass ISO dates for fromA/toA (baseline) and fromB/toB (comparison). Use this when the user asks "why did my spending go up", "что изменилось у меня в месяце", "де я витрачаю більше". The decomposition is exact: delta = price + volume + cross + mixIn + mixOut.';
+    'Causal decomposition of spending change between two periods. Returns: (1) totals.delta — the absolute change spendB − spendA, ALWAYS cite this directly for the overall number, never sum the effects yourself; (2) priceEffect / volumeEffect / crossEffect / mixInEffect / mixOutEffect — five named components that exactly sum to totals.delta; (3) a pre-rendered Ukrainian narrative string covering all five effects plus top contributors — prefer quoting it verbatim; (4) topIncreases and topDecreases — top 5 merchants or categories driving the change, each with reason (PRICE / VOLUME / NEW / DROPPED / MIXED). Pass groupBy: "category" for category-level questions, "merchant" (default) for merchant-level ones. Pass ISO dates for fromA/toA (baseline) and fromB/toB (comparison).';
   readonly inputSchema = ExplainSpendingChangeInput;
   readonly outputSchema = z.unknown();
   readonly authorization = { scope: 'OWN_DATA' as const, requiresConfirmation: false };

@@ -82,6 +82,235 @@ export class CreateGoalTool implements ToolDefinition<CreateGoalInput, unknown> 
   }
 }
 
+// ────────────────────────── Update existing goal ──────────────────────────
+
+const UpdateGoalInput = z
+  .object({
+    goalId: z.string().uuid(),
+    newTargetAmount: z
+      .string()
+      .regex(/^\d+(\.\d{1,2})?$/)
+      .optional(),
+    newDeadline: z
+      .string()
+      .optional()
+      .describe('ISO date string. Pass null to clear the deadline.'),
+    clearDeadline: z.boolean().optional(),
+    newPriority: z.number().int().min(1).max(5).optional(),
+  })
+  .refine(
+    (v) =>
+      v.newTargetAmount !== undefined ||
+      v.newDeadline !== undefined ||
+      v.clearDeadline === true ||
+      v.newPriority !== undefined,
+    {
+      message:
+        'Provide at least one field to change: newTargetAmount, newDeadline, clearDeadline, or newPriority.',
+    },
+  );
+type UpdateGoalInput = z.infer<typeof UpdateGoalInput>;
+
+@Injectable()
+export class UpdateGoalTool implements ToolDefinition<UpdateGoalInput, unknown> {
+  readonly name = 'update_goal';
+  readonly category = 'MUTATION' as const;
+  readonly description =
+    'Stages a change to an existing goal: target amount, deadline, or priority. ' +
+    'Pass goalId plus at least one of newTargetAmount, newDeadline (ISO date), ' +
+    'clearDeadline (true to remove the deadline), newPriority (1-5). ' +
+    'Use this when the user wants to MODIFY an existing goal instead of creating ' +
+    'a new one (e.g. "перенеси дедлайн", "збільш ціль до 250к", "знизь пріоритет"). ' +
+    'Always call get_goals first to look up the right goalId.';
+  readonly inputSchema = UpdateGoalInput;
+  readonly outputSchema = z.unknown();
+  readonly authorization = { scope: 'OWN_DATA' as const, requiresConfirmation: true };
+  readonly sideEffects = {
+    writes: ['Goal'],
+    emitsEvents: ['goal.updated'],
+    estimatedCost: 'LOW' as const,
+  };
+
+  constructor(
+    private readonly goals: GoalsService,
+    private readonly staged: StagedActionsService,
+  ) {}
+
+  async execute(input: UpdateGoalInput, ctx: { userId: string }): Promise<ToolResult<unknown>> {
+    let goal;
+    try {
+      goal = await this.goals.getGoal(ctx.userId, input.goalId);
+    } catch {
+      return {
+        ok: false,
+        retryable: false,
+        error: { kind: 'NOT_FOUND', resource: 'goal', id: input.goalId },
+      };
+    }
+
+    const changes: Record<string, unknown> = { action: 'Оновити фінансову ціль', goalName: goal.name };
+    if (input.newTargetAmount !== undefined) {
+      changes.newTargetAmount = input.newTargetAmount;
+      changes.currentTargetAmount = goal.targetAmount.toFixed(2);
+    }
+    if (input.clearDeadline) {
+      changes.newDeadline = null;
+    } else if (input.newDeadline !== undefined) {
+      changes.newDeadline = input.newDeadline;
+    }
+    if (input.newPriority !== undefined) {
+      changes.newPriority = input.newPriority;
+    }
+
+    const action = await this.staged.stage({
+      userId: ctx.userId,
+      actionType: 'goal.update',
+      payload: input as Record<string, unknown>,
+      preview: changes,
+      initiatedBy: 'agent',
+    });
+    return {
+      ok: false,
+      retryable: false,
+      error: {
+        kind: 'CONFIRMATION_REQUIRED',
+        stagedActionId: action.id,
+        preview: action.preview,
+      },
+    };
+  }
+}
+
+// ────────────────────────── Goal lifecycle (pause / resume) ──────────────────────────
+
+const GoalIdInput = z.object({ goalId: z.string().uuid() });
+type GoalIdInput = z.infer<typeof GoalIdInput>;
+
+@Injectable()
+export class PauseGoalTool implements ToolDefinition<GoalIdInput, unknown> {
+  readonly name = 'pause_goal';
+  readonly category = 'MUTATION' as const;
+  readonly description =
+    'Pauses an active goal — feasibility recalcs stop and the goal is hidden from the active list. Reversible via resume_goal. Use when the user says "постав ціль на паузу", "припини відраховувати по цій цілі".';
+  readonly inputSchema = GoalIdInput;
+  readonly outputSchema = z.unknown();
+  readonly authorization = { scope: 'OWN_DATA' as const, requiresConfirmation: false };
+  readonly sideEffects = {
+    writes: ['Goal'],
+    emitsEvents: ['goal.paused'],
+    estimatedCost: 'LOW' as const,
+  };
+
+  constructor(private readonly goals: GoalsService) {}
+
+  async execute(input: GoalIdInput, ctx: { userId: string }): Promise<ToolResult<unknown>> {
+    try {
+      const goal = await this.goals.pause(ctx.userId, input.goalId);
+      return { ok: true, data: { id: goal.id, status: goal.status } };
+    } catch {
+      return {
+        ok: false,
+        retryable: false,
+        error: { kind: 'NOT_FOUND', resource: 'goal', id: input.goalId },
+      };
+    }
+  }
+}
+
+@Injectable()
+export class ResumeGoalTool implements ToolDefinition<GoalIdInput, unknown> {
+  readonly name = 'resume_goal';
+  readonly category = 'MUTATION' as const;
+  readonly description =
+    'Resumes a paused goal — it returns to the active list and feasibility recalcs continue. Use when the user says "повернути ціль", "відновити ціль".';
+  readonly inputSchema = GoalIdInput;
+  readonly outputSchema = z.unknown();
+  readonly authorization = { scope: 'OWN_DATA' as const, requiresConfirmation: false };
+  readonly sideEffects = {
+    writes: ['Goal'],
+    emitsEvents: ['goal.resumed'],
+    estimatedCost: 'LOW' as const,
+  };
+
+  constructor(private readonly goals: GoalsService) {}
+
+  async execute(input: GoalIdInput, ctx: { userId: string }): Promise<ToolResult<unknown>> {
+    try {
+      const goal = await this.goals.resume(ctx.userId, input.goalId);
+      return { ok: true, data: { id: goal.id, status: goal.status } };
+    } catch {
+      return {
+        ok: false,
+        retryable: false,
+        error: { kind: 'NOT_FOUND', resource: 'goal', id: input.goalId },
+      };
+    }
+  }
+}
+
+// ────────────────────────── Abandon goal (destructive) ──────────────────────────
+
+const AbandonGoalInput = z.object({
+  goalId: z.string().uuid(),
+  reason: z.string().max(500).optional(),
+});
+type AbandonGoalInput = z.infer<typeof AbandonGoalInput>;
+
+@Injectable()
+export class AbandonGoalTool implements ToolDefinition<AbandonGoalInput, unknown> {
+  readonly name = 'abandon_goal';
+  readonly category = 'MUTATION' as const;
+  readonly description =
+    'Stages abandoning a goal — marks it as ABANDONED, hides it permanently from active lists. Use when the user explicitly says "облиш ціль", "видали ціль", "більше не потрібна". User must confirm — destructive action.';
+  readonly inputSchema = AbandonGoalInput;
+  readonly outputSchema = z.unknown();
+  readonly authorization = { scope: 'OWN_DATA' as const, requiresConfirmation: true };
+  readonly sideEffects = {
+    writes: ['Goal'],
+    emitsEvents: ['goal.abandoned'],
+    estimatedCost: 'LOW' as const,
+  };
+
+  constructor(
+    private readonly goals: GoalsService,
+    private readonly staged: StagedActionsService,
+  ) {}
+
+  async execute(input: AbandonGoalInput, ctx: { userId: string }): Promise<ToolResult<unknown>> {
+    let goal;
+    try {
+      goal = await this.goals.getGoal(ctx.userId, input.goalId);
+    } catch {
+      return {
+        ok: false,
+        retryable: false,
+        error: { kind: 'NOT_FOUND', resource: 'goal', id: input.goalId },
+      };
+    }
+
+    const action = await this.staged.stage({
+      userId: ctx.userId,
+      actionType: 'goal.abandon',
+      payload: input as Record<string, unknown>,
+      preview: {
+        action: 'Облишити фінансову ціль',
+        goalName: goal.name,
+        reason: input.reason ?? null,
+      },
+      initiatedBy: 'agent',
+    });
+    return {
+      ok: false,
+      retryable: false,
+      error: {
+        kind: 'CONFIRMATION_REQUIRED',
+        stagedActionId: action.id,
+        preview: action.preview,
+      },
+    };
+  }
+}
+
 // ────────────────────────── Contribute to goal ──────────────────────────
 
 const ContributeInput = z.object({
@@ -616,6 +845,39 @@ export class StagedActionExecutor {
           amount: payload.amount as string,
           sourceType: 'MANUAL',
         });
+      case 'goal.update': {
+        const goalId = payload.goalId as string;
+        if (payload.newTargetAmount !== undefined) {
+          await this.goals.adjustTarget(
+            userId,
+            goalId,
+            payload.newTargetAmount as string,
+          );
+        }
+        if (payload.clearDeadline === true) {
+          await this.goals.adjustDeadline(userId, goalId, null);
+        } else if (payload.newDeadline !== undefined) {
+          await this.goals.adjustDeadline(
+            userId,
+            goalId,
+            new Date(payload.newDeadline as string),
+          );
+        }
+        if (payload.newPriority !== undefined) {
+          await this.goals.adjustPriority(
+            userId,
+            goalId,
+            payload.newPriority as number,
+          );
+        }
+        return this.goals.recalculateFeasibility(userId, goalId);
+      }
+      case 'goal.abandon':
+        return this.goals.abandon(
+          userId,
+          payload.goalId as string,
+          payload.reason as string | undefined,
+        );
       case 'budget.adjust-line':
         return this.budgeting.adjustLine(userId, {
           budgetId: payload.budgetId as string,

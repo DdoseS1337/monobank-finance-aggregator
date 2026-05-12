@@ -233,7 +233,15 @@ export class GetRecommendationsTool implements ToolDefinition<NoInput, unknown> 
 export class GetTransactionsTool implements ToolDefinition<TransactionsInput, unknown> {
   readonly name = 'get_transactions';
   readonly category = 'READ' as const;
-  readonly description = 'Returns recent transactions filtered by date, type, etc.';
+  readonly description =
+    'Returns transactions for a period AND server-computed aggregates. ' +
+    'For ANY "скільки я витратив за період X" question, cite totalSpend ' +
+    'directly — never sum the items list, it is capped at `limit` (default 50) ' +
+    'and silently undercounts active months. ' +
+    'Aggregates use the same filter as explain_spending_change (DEBIT + ' +
+    'POSTED|PENDING + dominant currency) so the two tools reconcile. ' +
+    'Returns: { items, totalSpend, totalIncome, spendCount, incomeCount, ' +
+    'currency, truncated }.';
   readonly inputSchema = TransactionsInput;
   readonly outputSchema = z.unknown();
   readonly authorization = { scope: 'OWN_DATA' as const, requiresConfirmation: false };
@@ -245,32 +253,102 @@ export class GetTransactionsTool implements ToolDefinition<TransactionsInput, un
     const limit = input.limit ?? 50;
     const from = input.fromDate ? new Date(input.fromDate) : dayjs().subtract(30, 'day').toDate();
     const to = input.toDate ? new Date(input.toDate) : new Date();
-    const items = await this.prisma.transaction.findMany({
+    const baseWhere = {
+      userId: ctx.userId,
+      transactionDate: { gte: from, lte: to },
+      ...(input.type ? { type: input.type } : {}),
+    } as const;
+
+    // Server-side aggregates over the FULL period (not the truncated slice).
+    // We mirror explain_spending_change's filter so totalSpend equals
+    // periodA.spend / periodB.spend in that tool — otherwise an LLM asking
+    // for a delta gets numbers that don't reconcile across tools.
+    const aggregateRows = await this.prisma.transaction.groupBy({
+      by: ['type', 'currency'],
       where: {
-        userId: ctx.userId,
-        transactionDate: { gte: from, lte: to },
-        ...(input.type ? { type: input.type } : {}),
+        ...baseWhere,
+        status: { in: ['POSTED', 'PENDING'] },
       },
+      _sum: { amount: true },
+      _count: { _all: true },
+    });
+
+    let totalSpend = 0;
+    let totalIncome = 0;
+    let spendCount = 0;
+    let incomeCount = 0;
+    let dominantCurrency = 'UAH';
+    const currencyTotals = new Map<string, number>();
+    for (const row of aggregateRows) {
+      const sum = Number(row._sum.amount ?? 0);
+      currencyTotals.set(
+        row.currency,
+        (currencyTotals.get(row.currency) ?? 0) + Math.abs(sum),
+      );
+    }
+    let max = -1;
+    for (const [cur, vol] of currencyTotals) {
+      if (vol > max) {
+        max = vol;
+        dominantCurrency = cur;
+      }
+    }
+    for (const row of aggregateRows) {
+      if (row.currency !== dominantCurrency) continue;
+      const sum = Number(row._sum.amount ?? 0);
+      if (row.type === 'DEBIT') {
+        totalSpend += sum;
+        spendCount += row._count._all;
+      } else if (row.type === 'CREDIT') {
+        totalIncome += sum;
+        incomeCount += row._count._all;
+      }
+    }
+    totalSpend = round2(totalSpend);
+    totalIncome = round2(totalIncome);
+
+    const items = await this.prisma.transaction.findMany({
+      where: baseWhere,
       orderBy: { transactionDate: 'desc' },
       take: limit,
       include: { category: { select: { name: true, slug: true } } },
     });
+
+    const totalMatchingItems = await this.prisma.transaction.count({
+      where: baseWhere,
+    });
+
     return {
       ok: true,
-      data: items.map((t) => ({
-        id: t.id,
-        date: t.transactionDate,
-        amount: Number(t.amount),
-        currency: t.currency,
-        type: t.type,
-        merchant: t.merchantName,
-        description: t.description,
-        category: t.category?.name ?? null,
-        categorySlug: t.category?.slug ?? null,
-        mccCode: t.mccCode,
-      })),
+      data: {
+        period: { from: from.toISOString(), to: to.toISOString() },
+        currency: dominantCurrency,
+        totalSpend,
+        totalIncome,
+        spendCount,
+        incomeCount,
+        truncated: totalMatchingItems > items.length,
+        returnedCount: items.length,
+        matchingCount: totalMatchingItems,
+        items: items.map((t) => ({
+          id: t.id,
+          date: t.transactionDate,
+          amount: Number(t.amount),
+          currency: t.currency,
+          type: t.type,
+          merchant: t.merchantName,
+          description: t.description,
+          category: t.category?.name ?? null,
+          categorySlug: t.category?.slug ?? null,
+          mccCode: t.mccCode,
+        })),
+      },
     };
   }
+}
+
+function round2(n: number): number {
+  return Math.round(n * 100) / 100;
 }
 
 const ISO_CODE = z

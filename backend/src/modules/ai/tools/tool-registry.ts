@@ -20,6 +20,7 @@ import {
   RunScenarioTool,
 } from './cognitive/cognitive-tools';
 import {
+  AbandonGoalTool,
   AcceptRecommendationTool,
   AddBudgetLineTool,
   AdjustBudgetLineTool,
@@ -27,7 +28,10 @@ import {
   ContributeToGoalTool,
   CreateBudgetTool,
   CreateGoalTool,
+  PauseGoalTool,
+  ResumeGoalTool,
   SnoozeRecommendationTool,
+  UpdateGoalTool,
 } from './mutation/mutation-tools';
 
 /**
@@ -58,6 +62,10 @@ export class ToolRegistry {
     calculate: CalculateTool,
     // Mutation
     createGoal: CreateGoalTool,
+    updateGoal: UpdateGoalTool,
+    pauseGoal: PauseGoalTool,
+    resumeGoal: ResumeGoalTool,
+    abandonGoal: AbandonGoalTool,
     createBudget: CreateBudgetTool,
     addBudgetLine: AddBudgetLineTool,
     archiveBudget: ArchiveBudgetTool,
@@ -83,6 +91,10 @@ export class ToolRegistry {
       explainSpendingChange,
       calculate,
       createGoal,
+      updateGoal,
+      pauseGoal,
+      resumeGoal,
+      abandonGoal,
       createBudget,
       addBudgetLine,
       archiveBudget,

@@ -1,11 +1,13 @@
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
-import { ArrowLeft, Trash2 } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { ApiError, getServerToken, goalsApi } from '@/lib/api';
 import { PageHeader } from '@/components/shared/page-header';
 import { MoneyDisplay } from '@/components/shared/money-display';
 import { FeasibilityRing } from '@/components/shared/feasibility-ring';
 import { ContributeForm } from './contribute-form';
+import { CopyId } from './copy-id';
+import { EditGoalForm } from './edit-form';
 import { LifecycleButtons } from './lifecycle-buttons';
 
 export const dynamic = 'force-dynamic';
@@ -42,6 +44,11 @@ export default async function GoalDetailPage({ params }: PageProps) {
         description={`Тип: ${TYPE_LABEL[goal.type]} · пріоритет ${goal.priority}`}
         actions={<LifecycleButtons goalId={goal.id} status={goal.status} />}
       />
+
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <span>ID цілі:</span>
+        <CopyId value={goal.id} />
+      </div>
 
       <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div className="md:col-span-2 rounded-xl border border-border bg-card p-5">
@@ -129,6 +136,22 @@ export default async function GoalDetailPage({ params }: PageProps) {
           <p className="mt-3 text-xs text-muted-foreground">
             Оцінка ймовірності досягти цілі вчасно — на основі поточного темпу контрибуцій і дедлайну.
           </p>
+        </div>
+      </section>
+
+      <section className="rounded-xl border border-border bg-card p-5">
+        <h2 className="text-sm font-semibold">Редагувати ціль</h2>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Зміна дедлайну або цільової суми перерахує feasibility-бал.
+        </p>
+        <div className="mt-4">
+          <EditGoalForm
+            goalId={goal.id}
+            currency={goal.baseCurrency}
+            currentDeadline={goal.deadline ?? null}
+            currentTarget={goal.targetAmount}
+            disabled={goal.status !== 'ACTIVE'}
+          />
         </div>
       </section>
 

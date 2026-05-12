@@ -32,6 +32,7 @@ import {
   RunScenarioTool,
 } from './tools/cognitive/cognitive-tools';
 import {
+  AbandonGoalTool,
   AcceptRecommendationTool,
   AddBudgetLineTool,
   AdjustBudgetLineTool,
@@ -39,8 +40,11 @@ import {
   ContributeToGoalTool,
   CreateBudgetTool,
   CreateGoalTool,
+  PauseGoalTool,
+  ResumeGoalTool,
   SnoozeRecommendationTool,
   StagedActionExecutor,
+  UpdateGoalTool,
 } from './tools/mutation/mutation-tools';
 
 import { AnalystAgent } from './agents/analyst.agent';
@@ -108,6 +112,10 @@ import { TransactionsModule } from '../transactions/transactions.module';
     ExplainSpendingChangeTool,
     CalculateTool,
     CreateGoalTool,
+    UpdateGoalTool,
+    PauseGoalTool,
+    ResumeGoalTool,
+    AbandonGoalTool,
     CreateBudgetTool,
     AddBudgetLineTool,
     ArchiveBudgetTool,

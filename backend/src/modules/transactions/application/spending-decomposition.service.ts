@@ -34,6 +34,12 @@ export interface MerchantDelta {
   status: 'BOTH' | 'NEW' | 'DROPPED';
 }
 
+export interface ContributorEntry {
+  label: string;
+  delta: number;
+  reason: 'PRICE' | 'VOLUME' | 'NEW' | 'DROPPED' | 'MIXED';
+}
+
 export interface DecompositionReport {
   currency: string;
   periodA: { from: string; to: string; spend: number; txCount: number };
@@ -47,6 +53,11 @@ export interface DecompositionReport {
     mixOutEffect: number; // negative spend from dropped merchants/categories
     crossEffect: number;
   };
+  /** Pre-rendered Ukrainian narrative — the agent should quote this verbatim. */
+  narrative: string;
+  /** Top drivers of the change, by absolute size. */
+  topIncreases: ContributorEntry[];
+  topDecreases: ContributorEntry[];
   groupBy: 'merchant' | 'category';
   items: MerchantDelta[];
 }
@@ -163,6 +174,32 @@ export function decomposeAggregations(
   const txCountA = aggA.reduce((s, r) => s + r.txCount, 0);
   const txCountB = aggB.reduce((s, r) => s + r.txCount, 0);
   const delta = spendB - spendA;
+  const deltaPct = spendA === 0 ? 0 : (delta / spendA) * 100;
+
+  const topIncreases: ContributorEntry[] = items
+    .filter((i) => i.delta > 0)
+    .slice(0, 5)
+    .map((i) => ({ label: i.label, delta: i.delta, reason: classifyReason(i) }));
+  const topDecreases: ContributorEntry[] = items
+    .filter((i) => i.delta < 0)
+    .slice(0, 5)
+    .map((i) => ({ label: i.label, delta: i.delta, reason: classifyReason(i) }));
+
+  const narrative = buildNarrative({
+    currency,
+    delta: round(delta),
+    deltaPct: round(deltaPct),
+    priceEffect: round(totalPrice),
+    volumeEffect: round(totalVolume),
+    crossEffect: round(totalCross),
+    mixInEffect: round(mixIn),
+    mixOutEffect: round(mixOut),
+    groupBy,
+    topIncreases,
+    topDecreases,
+    periodA: input.periodA,
+    periodB: input.periodB,
+  });
 
   return {
     currency,
@@ -180,16 +217,112 @@ export function decomposeAggregations(
     },
     totals: {
       delta: round(delta),
-      deltaPct: spendA === 0 ? 0 : round((delta / spendA) * 100),
+      deltaPct: round(deltaPct),
       priceEffect: round(totalPrice),
       volumeEffect: round(totalVolume),
       crossEffect: round(totalCross),
       mixInEffect: round(mixIn),
       mixOutEffect: round(mixOut),
     },
+    narrative,
+    topIncreases,
+    topDecreases,
     groupBy,
     items,
   };
+}
+
+function classifyReason(item: MerchantDelta): ContributorEntry['reason'] {
+  if (item.status === 'NEW') return 'NEW';
+  if (item.status === 'DROPPED') return 'DROPPED';
+  const absPrice = Math.abs(item.priceEffect);
+  const absVolume = Math.abs(item.volumeEffect);
+  if (absPrice > absVolume * 1.5) return 'PRICE';
+  if (absVolume > absPrice * 1.5) return 'VOLUME';
+  return 'MIXED';
+}
+
+interface NarrativeInput {
+  currency: string;
+  delta: number;
+  deltaPct: number;
+  priceEffect: number;
+  volumeEffect: number;
+  crossEffect: number;
+  mixInEffect: number;
+  mixOutEffect: number;
+  groupBy: 'merchant' | 'category';
+  topIncreases: ContributorEntry[];
+  topDecreases: ContributorEntry[];
+  periodA?: { from: string; to: string };
+  periodB?: { from: string; to: string };
+}
+
+function buildNarrative(n: NarrativeInput): string {
+  const dim = n.groupBy === 'merchant' ? 'мерчантів' : 'категорій';
+  const dimSingle = n.groupBy === 'merchant' ? 'мерчанта' : 'категорії';
+  const direction =
+    n.delta > 0 ? 'зросли' : n.delta < 0 ? 'зменшились' : 'не змінились';
+  const fmt = (v: number): string => {
+    const abs = Math.abs(v).toLocaleString('uk-UA', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    const sign = v > 0 ? '+' : v < 0 ? '−' : '';
+    return `${sign}${abs} ${n.currency}`;
+  };
+  const periodLabel = (p?: { from: string; to: string }): string => {
+    if (!p) return '';
+    return `${p.from.slice(0, 10)} … ${p.to.slice(0, 10)}`;
+  };
+  const reasonLabel: Record<ContributorEntry['reason'], string> = {
+    PRICE: 'середній чек зріс/впав',
+    VOLUME: 'більше/менше походів',
+    NEW: `новий ${dimSingle}`,
+    DROPPED: `відсутній цього періоду ${dimSingle}`,
+    MIXED: 'і ціна, і обсяг змінились',
+  };
+
+  const lines: string[] = [];
+  if (n.periodA && n.periodB) {
+    lines.push(
+      `Порівняння періодів: A = ${periodLabel(n.periodA)} → B = ${periodLabel(n.periodB)}.`,
+    );
+  }
+  lines.push(
+    `Витрати ${direction} на ${fmt(n.delta)} (${n.deltaPct > 0 ? '+' : ''}${n.deltaPct.toFixed(1)}%).`,
+  );
+  lines.push('Розклад дельти (сума з 5 складових точно дорівнює загальній зміні):');
+  lines.push(
+    `  • Ціновий ефект: ${fmt(n.priceEffect)} — той самий ${dimSingle}, інший середній чек.`,
+  );
+  lines.push(
+    `  • Об'ємний ефект: ${fmt(n.volumeEffect)} — той самий ${dimSingle}, інша кількість транзакцій.`,
+  );
+  lines.push(
+    `  • Перехресний ефект: ${fmt(n.crossEffect)} — спільна зміна ціни × обсягу.`,
+  );
+  lines.push(
+    `  • Нові ${dim} у періоді B (mixIn): ${fmt(n.mixInEffect)}.`,
+  );
+  lines.push(
+    `  • Відсутні у періоді B (mixOut): ${fmt(n.mixOutEffect)}.`,
+  );
+
+  if (n.topIncreases.length > 0) {
+    lines.push(`Топ зростання серед ${dim}:`);
+    for (const e of n.topIncreases) {
+      lines.push(`  • ${e.label}: ${fmt(e.delta)} (${reasonLabel[e.reason]}).`);
+    }
+  }
+  if (n.topDecreases.length > 0) {
+    lines.push(`Топ зменшення серед ${dim}:`);
+    for (const e of n.topDecreases) {
+      lines.push(`  • ${e.label}: ${fmt(e.delta)} (${reasonLabel[e.reason]}).`);
+    }
+  }
+
+  return lines.join('\n');
 }
 
 /**

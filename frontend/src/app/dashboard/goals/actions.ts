@@ -64,3 +64,21 @@ export async function recalcFeasibilityAction(goalId: string) {
   revalidatePath(`/dashboard/goals/${goalId}`);
   revalidatePath('/dashboard/goals');
 }
+
+export async function adjustDeadlineAction(goalId: string, newDeadline: string | null) {
+  const token = await getServerToken();
+  if (!token) redirect('/login');
+  await goalsApi.adjustDeadline(token, goalId, newDeadline);
+  revalidatePath(`/dashboard/goals/${goalId}`);
+  revalidatePath('/dashboard/goals');
+  revalidatePath('/dashboard');
+}
+
+export async function adjustTargetAction(goalId: string, newTarget: string) {
+  const token = await getServerToken();
+  if (!token) redirect('/login');
+  await goalsApi.adjustTarget(token, goalId, newTarget);
+  revalidatePath(`/dashboard/goals/${goalId}`);
+  revalidatePath('/dashboard/goals');
+  revalidatePath('/dashboard');
+}

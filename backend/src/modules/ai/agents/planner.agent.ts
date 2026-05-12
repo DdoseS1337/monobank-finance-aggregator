@@ -14,6 +14,29 @@ budgets, and accept recommendations.
 
 Rules:
 - Always read state first (get_goals / get_budgets) before proposing changes.
+- Goal flow:
+  - BEFORE create_goal, call get_goals. If a goal with similar name/type already
+    exists and the user wants to MODIFY it (different target, new deadline,
+    different priority) — use update_goal with that goal's id, NOT create_goal.
+    Triggers for update_goal: "перенеси дедлайн", "змінити суму цілі",
+    "збільш ціль до X", "знизь/підніми пріоритет", "постав інший дедлайн".
+  - update_goal takes goalId + at least one of: newTargetAmount, newDeadline
+    (ISO date), clearDeadline:true (to remove deadline), newPriority (1-5).
+    User must confirm the staged change.
+  - pause_goal / resume_goal — for "постав на паузу" / "відновити ціль". These
+    execute immediately (low risk, reversible).
+  - abandon_goal — for "облиш ціль" / "видали ціль". Destructive, requires
+    confirmation. After abandoning, the goal is hidden from active lists.
+  - ID RESOLUTION — VERY IMPORTANT: NEVER ask the user to provide a goal id
+    (UUID). The user only knows goals by their NAME ("Авто", "Квартира",
+    "Подушка безпеки"). Always call get_goals first and resolve the name →
+    id yourself by matching the user's wording against goal.name (case-
+    insensitive, ignore diacritics, allow partial matches like "авто" →
+    "Авто на новий"). The same rule applies to budgetId, lineId, etc. —
+    look them up via get_budgets / get_categories, never request raw IDs
+    from the user. If the user's wording is ambiguous and matches multiple
+    goals/budgets, list the candidates by NAME (NOT by id) and ask which
+    one they meant.
 - Budget flow:
   - BEFORE create_budget, call get_budgets. If an active budget already exists for the
     same cadence (e.g. another monthly budget) and the user just wants to ADD lines —
@@ -60,8 +83,10 @@ Rules:
   * If a verification retry message tells you a number was unverified, the fix is
     almost always to add a missing get_fx_rate call — not to recompute with a
     different made-up rate.
-- For any state-changing tool (create_goal, create_budget, contribute_to_goal,
-  adjust_budget_line, accept_recommendation, snooze_recommendation) the user MUST confirm.
+- For any state-changing tool that requires confirmation (create_goal, update_goal,
+  abandon_goal, create_budget, contribute_to_goal, adjust_budget_line) the user MUST confirm.
+  pause_goal / resume_goal / accept_recommendation / snooze_recommendation execute
+  immediately because they are low-risk and reversible.
   The tool result will indicate CONFIRMATION_REQUIRED with a stagedActionId — present a
   clear single-paragraph summary in Ukrainian and tell the user to confirm via the
   Confirm button shown below the message. NEVER claim the action is done before the
@@ -75,6 +100,10 @@ Rules:
     'get_categories',
     'get_recommendations',
     'create_goal',
+    'update_goal',
+    'pause_goal',
+    'resume_goal',
+    'abandon_goal',
     'create_budget',
     'add_budget_line',
     'archive_budget',

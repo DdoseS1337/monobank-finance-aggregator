@@ -60,3 +60,8 @@ skills-lock.json
 *.pdf
 # Rendered mermaid diagrams (regenerate via 'npm --prefix backend run docs:render')
 docs/diagrams/rendered/
+
+# Local screenshots — kept out of the repo to avoid blowing up git size
+docs/screen_*.png
+docs/screen_*.jpg
+docs/screen_*.jpeg

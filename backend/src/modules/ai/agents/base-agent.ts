@@ -105,6 +105,7 @@ export abstract class BaseAgent {
     const toolResults: AgentRunOutput['toolCalls'] = [];
     const pendingConfirmations: AgentRunOutput['pendingConfirmations'] = [];
     let verificationRetried = false;
+    let consecutiveBadCalls = 0;
 
     for (let loop = 0; loop < MAX_TOOL_LOOPS; loop++) {
       const start = Date.now();
@@ -212,6 +213,7 @@ export abstract class BaseAgent {
         };
       }
 
+      let productiveCallInLoop = false;
       for (const call of toolCalls) {
         if (call.type !== 'function') continue;
         const tool = this.registry.get(call.function.name);
@@ -220,6 +222,14 @@ export abstract class BaseAgent {
             role: 'tool',
             tool_call_id: call.id,
             content: JSON.stringify({ ok: false, error: 'Unknown tool' }),
+          });
+          // Surface invalid tool calls so the UI / eval logs can see what the
+          // model tried, instead of silently burning loop budget.
+          toolResults.push({
+            name: call.function.name,
+            ok: false,
+            input: call.function.arguments,
+            output: { kind: 'UNKNOWN_TOOL', name: call.function.name },
           });
           continue;
         }
@@ -237,8 +247,15 @@ export abstract class BaseAgent {
             tool_call_id: call.id,
             content: JSON.stringify({ ok: false, error: 'VALIDATION', message: errMsg }),
           });
+          toolResults.push({
+            name: tool.name,
+            ok: false,
+            input: parsed,
+            output: { kind: 'VALIDATION', message: errMsg },
+          });
           continue;
         }
+        productiveCallInLoop = true;
         const callStart = Date.now();
         const result = await tool.execute(validation.data, {
           userId: input.userId,
@@ -301,6 +318,22 @@ export abstract class BaseAgent {
           tool_call_id: call.id,
           content: llmContent,
         });
+      }
+
+      // Circuit breaker: if the model keeps emitting only unknown-tool or
+      // validation-failed calls, abort early instead of burning the full
+      // loop budget. Three strikes is enough signal that it's stuck.
+      if (productiveCallInLoop) {
+        consecutiveBadCalls = 0;
+      } else {
+        consecutiveBadCalls += 1;
+        if (consecutiveBadCalls >= 3) {
+          this.logger.warn(
+            `Aborting agent loop after ${consecutiveBadCalls} consecutive ` +
+              `invalid tool-call attempts (sessionId=${input.sessionId}).`,
+          );
+          break;
+        }
       }
     }
 
